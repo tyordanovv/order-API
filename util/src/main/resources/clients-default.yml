@@ -1,0 +1,7 @@
+clients:
+  delivery:
+    url: http://localhost:8080
+  email:
+    url: http://localhost:8081
+  product:
+    url: http://localhost:8083
