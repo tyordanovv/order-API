@@ -1,9 +1,17 @@
-server:
-  port: 8080
-client:
-  delivery:
-    url: http://localhost:8080
-spring:
-  application:
-    name: delivery
+server.port: 8080
+server.error.include-message: always
+#client:
+#  delivery:
+#    url: http://localhost:8080
+#spring:
+#  application:
+#    name: delivery
+logging:
+  level:
+    root: INFO
+    bg.tyordanovv: DEBUG
 
+---
+spring.config.activate.on-profile: docker
+
+server.port: 8080

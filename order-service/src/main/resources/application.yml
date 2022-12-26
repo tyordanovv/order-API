@@ -1,7 +1,41 @@
-server:
-  port: 8082
-spring:
-  application:
-    name: order
-  rabbitmq:
-    addresses: localhost:5672
+server.port: 8082
+
+server.error.include-message: always
+
+app:
+  product-service:
+    host: localhost
+    port: 8083
+  delivery-service:
+    host: localhost
+    port: 8080
+  email-service:
+    host: localhost
+    port: 8081
+
+logging:
+  level:
+    root: INFO
+    bg.tyordanovv: DEBUG
+
+---
+spring.config.active.on-profile: docker
+
+server.port: 8082
+
+app:
+  product-service:
+    host: localhost
+    port: 8080
+  delivery-service:
+    host: localhost
+    port: 8080
+  email-service:
+    host: localhost
+    port: 8080
+
+#spring:
+#  application:
+#    name: order
+#  rabbitmq:
+#    addresses: localhost:5672

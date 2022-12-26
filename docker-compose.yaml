@@ -1,0 +1,45 @@
+version: '1.0'
+
+services:
+  product:
+    image: tyordanovv/product-service:latest
+    container_name: product-service
+    ports:
+      - "8083:8083"
+    build: product-service
+    mem_limit: 200m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  delivery:
+    image: tyordanovv/delivery-service:latest
+    container_name: delivery-service
+    ports:
+      - "8080:8080"
+    build: delivery-service
+    mem_limit: 200m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  email:
+    image: tyordanovv/email-service:latest
+    container_name: email-service
+    ports:
+      - "8081:8081"
+    build: email-service
+    mem_limit: 200m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  order:
+    image: tyordanovv/erder-service:latest
+    container_name: order-service
+    ports:
+      - "8082:8082"
+    build: order-service
+    mem_limit: 200m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+
+

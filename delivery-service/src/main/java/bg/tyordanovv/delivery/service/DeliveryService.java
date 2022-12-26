@@ -1,30 +1,34 @@
 package bg.tyordanovv.delivery.service;
 
-import bg.tyordanovv.clients.delivery.CreateDeliveryRequest;
-import bg.tyordanovv.delivery.api.DeliveryController;
+import bg.tyordanovv.controller.delivery.DeliveryController;
+import bg.tyordanovv.core.delivery.DeliveryStatus;
+import bg.tyordanovv.core.product.ProductEntity;
+import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
+@NoArgsConstructor
 public class DeliveryService implements DeliveryController {
     @Override
-    public Mono<Void> createDelivery(CreateDeliveryRequest request) {
+    public void createDelivery(CreateDeliveryRequest request) {
         log.info("create delivery");
-        return null;
+//        OrderEntity entity = new OrderEntity();
+        ProductEntity product = new ProductEntity();
     }
 
     @Override
-    public Mono<Void> cancelDelivery(Long deliveryId) {
+    public void cancelDelivery(Long deliveryId) {
         log.info("cancel delivery");
-        return null;
+//        return null;
     }
 
     @Override
-    public Mono<String> getDeliveryStatus(Long deliveryId) {
+    public DeliveryStatus getDeliveryStatus(Long deliveryId) {
         log.info("get delivery " + deliveryId);
-
-        return null;
+//        return Mono.just(new DeliveryStatus(1));
+        return new DeliveryStatus(1);
     }
 }
