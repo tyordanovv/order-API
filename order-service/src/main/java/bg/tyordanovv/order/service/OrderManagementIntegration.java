@@ -4,7 +4,7 @@ import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.email.EmailController;
 import bg.tyordanovv.controller.product.ProductController;
 import bg.tyordanovv.core.delivery.DeliveryStatus;
-import bg.tyordanovv.core.product.ProductEntity;
+import bg.tyordanovv.core.product.ProductSummary;
 import bg.tyordanovv.exceptions.CustomHttpError;
 import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.exceptions.NotFoundException;
@@ -46,11 +46,11 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
             RestTemplate restTemplate,
             ObjectMapper mapper,
             @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.host}") String productServicePort,
+            @Value("${app.product-service.port}") String productServicePort,
             @Value("${app.delivery-service.host}") String deliveryServiceHost,
-            @Value("${app.delivery-service.host}") String deliveryServicePort,
+            @Value("${app.delivery-service.port}") String deliveryServicePort,
             @Value("${app.email-service.host}") String emailServiceHost,
-            @Value("${app.email-service.host}") String emailServicePort
+            @Value("${app.email-service.port}") String emailServicePort
             ){
         this.restTemplate = restTemplate;
         this.mapper = mapper;
@@ -107,7 +107,7 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
             String url = PRODUCT_SERVICE_URL + productId;
             log.debug("Will call getProductByID API on URL: {}", url);
 
-            ProductEntity product = restTemplate.getForObject(url, ProductEntity.class);
+            ProductSummary product = restTemplate.getForObject(url, ProductSummary.class);
             log.debug("Found a product with id: {}", product.getProductId());
         } catch (HttpClientErrorException e){
 

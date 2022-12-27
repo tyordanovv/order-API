@@ -1,4 +1,6 @@
 package bg.tyordanovv.delivery.persistence;
 
-public interface DeliveryRepository {
+import org.springframework.data.repository.CrudRepository;
+
+public interface DeliveryRepository extends CrudRepository<DeliveryEntity, Long> {
 }

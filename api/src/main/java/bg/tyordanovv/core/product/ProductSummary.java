@@ -1,22 +1,22 @@
 package bg.tyordanovv.core.product;
 
 
-public class ProductEntity {
+public class ProductSummary {
     private final Long productId;
     private final String name;
     private double weight;
     private int quantity;
     private double review;
 
-    public ProductEntity(){
-        this.productId = 0l;
+    public ProductSummary(){
+        this.productId = 0L;
         this.name = "no name";
         this.weight = 0;
         this.quantity = 0;
         this.review = 0;
     }
 
-    public ProductEntity(
+    public ProductSummary(
             Long productId,
             String name,
             double weight,

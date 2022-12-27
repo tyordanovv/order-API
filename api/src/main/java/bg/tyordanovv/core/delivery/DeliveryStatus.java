@@ -2,18 +2,14 @@ package bg.tyordanovv.core.delivery;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class DeliveryStatus {
-    private enum Status{
-        PROCESSING,
-        SHIPPED,
-        DELIVERED,
-        CANCELED,
-        RETURNED,
-        NON_AVAILABLE
-    }
-
-    int n;
+    private DeliveryStatusEnum status;
+    private Date lastChange;
 }

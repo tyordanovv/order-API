@@ -1,11 +1,17 @@
 server.port: 8080
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    password: password
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/delivery
+
 server.error.include-message: always
-#client:
-#  delivery:
-#    url: http://localhost:8080
-#spring:
-#  application:
-#    name: delivery
+
 logging:
   level:
     root: INFO

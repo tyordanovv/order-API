@@ -1,18 +1,10 @@
 server.port: 8081
 server.error.include-message: always
 
-#client:
-#  email:
-#    url: http://localhost:8081
-
 logging:
   level:
     root: INFO
     bg.tyordanovv: DEBUG
-
-#spring:
-#  application:
-#    name: email
 
 ---
 spring.config.activate.on-profile: docker

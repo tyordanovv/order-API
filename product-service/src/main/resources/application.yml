@@ -1,18 +1,21 @@
 server.port: 8083
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    password: password
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/product
+
 server.error.include-message: always
 
-#logging:
-#  level:
-#    root: INFO
-#    bg.tyordanovv: DEBUG
-#client:
-#  product:
-#    url: http://localhost:8083
-#spring:
-#  application:
-#    name: product
-#  rabbitmq:
-#    addresses: localhost:5672
+logging:
+  level:
+    root: INFO
+    bg.tyordanovv: DEBUG
 
 ---
 spring.config.activate.on-profile: docker
