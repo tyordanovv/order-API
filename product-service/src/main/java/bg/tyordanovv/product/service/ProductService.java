@@ -1,6 +1,7 @@
 package bg.tyordanovv.product.service;
 
 import bg.tyordanovv.controller.product.ProductController;
+import bg.tyordanovv.controller.product.ProductSummaryController;
 import bg.tyordanovv.requests.product.CreateProductRequest;
 import bg.tyordanovv.requests.product.ProductQuantityRequest;
 import bg.tyordanovv.responses.product.ProductSummaryResponse;
@@ -11,12 +12,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-public class ProductService implements ProductController {
-    @Override
-    public void editProductQuantity(List<ProductQuantityRequest> productList) {
-        log.info("product quantity edited");
-        //        return null;
-    }
+public class ProductService implements ProductController, ProductSummaryController {
 
     @Override
     public List<ProductSummaryResponse> getProductByCategory(String category) {
@@ -42,5 +38,10 @@ public class ProductService implements ProductController {
     public void deleteProduct(Long productId) {
         log.info("product deleted");
 //        return null;
+    }
+
+    @Override
+    public void editProduct(Long productId) {
+
     }
 }

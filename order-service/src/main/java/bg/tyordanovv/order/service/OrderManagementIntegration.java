@@ -3,7 +3,10 @@ package bg.tyordanovv.order.service;
 import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.email.EmailController;
 import bg.tyordanovv.controller.product.ProductController;
+import bg.tyordanovv.controller.product.ProductQuantity;
+import bg.tyordanovv.controller.product.ProductSummaryController;
 import bg.tyordanovv.core.delivery.DeliveryStatus;
+import bg.tyordanovv.core.email.EmailType;
 import bg.tyordanovv.core.product.ProductSummary;
 import bg.tyordanovv.exceptions.CustomHttpError;
 import bg.tyordanovv.exceptions.InvalidInputException;
@@ -32,7 +35,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 @Slf4j
 @Component
-public class OrderManagementIntegration implements DeliveryController, ProductController, EmailController {
+public class OrderManagementIntegration implements DeliveryController, EmailController, ProductSummaryController, ProductQuantity {
 
     private final String PRODUCT_SERVICE_URL;
     private final String DELIVERY_SERVICE_URL;
@@ -78,14 +81,6 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
         String url = DELIVERY_SERVICE_URL + "/api/v1/delivery/get-status/" + deliveryId;
         log.info(url);
 
-//        return webClient.get()
-//                .uri(url)
-//                .retrieve()
-//                .bodyToMono(DeliveryStatus.class)
-//                .log(log.getName(), Level.FINE)
-//                .onErrorMap(WebClientResponseException.class,
-//                        this::handleException
-//                );
         return null;
     }
 
@@ -93,12 +88,6 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
     public void editProductQuantity(List<ProductQuantityRequest> productList) {
         log.info("order mng editProductQuantity");
         //        return null;
-    }
-
-    @Override
-    public List<ProductSummaryResponse> getProductByCategory(String category) {
-        log.info("order mng getProductByCategory");
-        return null;
     }
 
     @Override
@@ -123,42 +112,6 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
             }
         }
         return null;
-    }
-
-    @Override
-    public void createProduct(CreateProductRequest request) {
-        log.info("order mng createProduct");
-//        return null;
-    }
-
-    @Override
-    public void deleteProduct(Long productId) {
-        log.info("order mng deleteProduct");
-//        return null;
-    }
-
-    @Override
-    public void sendInvoice(EmailRequestInvoice requestInvoice) {
-        log.info("send invoice in OrderManagementIntegration");
-//        return null;
-    }
-
-    @Override
-    public void sendDeliveryStatus(EmailRequestDeliveryStatus requestDeliveryStatus) {
-        log.info("send status in OrderManagementIntegration");
-//        return null;
-    }
-
-    @Override
-    public void sendCancelConfirmation(EmailRequestCancelOrder requestCancelOrder) {
-        log.info("send cancel conf in OrderManagementIntegration");
-//        return null;
-    }
-
-    @Override
-    public void sendReturnOrderConfirmation(EmailRequestCancelOrder returnOrderRequest) {
-        log.info("send return confirm in OrderManagementIntegration");
-//        return null;
     }
 
 //    private Throwable handleException(Throwable ex) {
@@ -191,5 +144,10 @@ public class OrderManagementIntegration implements DeliveryController, ProductCo
         } catch (IOException ioex) {
             return ex.getMessage();
         }
+    }
+
+    @Override
+    public void send(EmailType type, String request) {
+
     }
 }
