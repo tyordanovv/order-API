@@ -18,7 +18,7 @@ public interface OrderController {
             value = "/api/v1/order/create",
             consumes = "application/json")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void createOrder(@RequestBody(required = false) OrderRequest body);
+    void createOrder(@RequestBody OrderRequest body);
 
     @PostMapping(value = "/api/v1/order/cancel/{orderId}")
     void cancelOrder(@PathVariable Long orderId);

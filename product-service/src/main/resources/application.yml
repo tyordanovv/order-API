@@ -3,7 +3,7 @@ server.port: 8083
 spring:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
   datasource:
     password: password

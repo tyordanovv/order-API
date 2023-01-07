@@ -6,14 +6,13 @@ public class ProductSummary {
     private final String name;
     private double weight;
     private int quantity;
-    private double review;
+//    private double review;
 
     public ProductSummary(){
         this.productId = 0L;
         this.name = "no name";
         this.weight = 0;
         this.quantity = 0;
-        this.review = 0;
     }
 
     public ProductSummary(
@@ -26,7 +25,6 @@ public class ProductSummary {
         this.name = name;
         this.weight = weight;
         this.quantity = quantity;
-        this.review = 0;
     }
 
     public Long getProductId() {
@@ -49,7 +47,4 @@ public class ProductSummary {
         this.quantity = quantity;
     }
 
-    public void setReview(double review) {
-        this.review = review;
-    }
 }

@@ -3,6 +3,8 @@ package bg.tyordanovv.order.service;
 import bg.tyordanovv.controller.order.OrderController;
 import bg.tyordanovv.core.delivery.DeliverySummary;
 import bg.tyordanovv.exceptions.NotFoundException;
+import bg.tyordanovv.order.persistence.OrderDetailsEntity;
+import bg.tyordanovv.order.persistence.OrderDetailsRepository;
 import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.order.persistence.OrderRepository;
 import bg.tyordanovv.requests.order.OrderRequest;
@@ -11,23 +13,62 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RestController
 public class OrderServiceImpl implements OrderController {
 
+    private final OrderManagementIntegration integrationOrder;
+    private final OrderRepository orderRepository;
+    private final OrderDetailsRepository orderDetailsRepository;
+
     @Autowired
-    private OrderManagementIntegration integrationOrder;
-    @Autowired
-    private OrderRepository orderRepository;
+    public OrderServiceImpl(
+            OrderManagementIntegration integrationOrder,
+            OrderRepository orderRepository,
+            OrderDetailsRepository orderDetailsRepository
+    ){
+        this.integrationOrder = integrationOrder;
+        this.orderRepository = orderRepository;
+        this.orderDetailsRepository = orderDetailsRepository;
+    }
+
 
     @Override
     public void createOrder(OrderRequest body) {
-        //crete delivery
+        try {
+            log.debug("creates a new composite entity for order");
 
+            OrderEntity order = new OrderEntity(
+                    1111111111L,
+                    body.firstName(),
+                    body.lastName(),
+                    body.email(),
+                    body.number()
+            );
+
+            //TODO: add check if product is available and get final price
+
+            Set<OrderDetailsEntity> listOfOrderDetails = new HashSet<>();
+            body.productList()
+                    .forEach(e -> listOfOrderDetails.add(
+                            new OrderDetailsEntity(order, e.id(), e.quantity(), false, 2)
+                    ));
+
+            order.setOrderDetails(listOfOrderDetails);
+
+            orderDetailsRepository.saveAll(listOfOrderDetails);
+            orderRepository.save(order);
+
+            //TODO MQ -> delivery service
+
+            log.debug("create order entity: {}", order.getId());
+
+        } catch (RuntimeException e) {
+            log.warn("create order failed", e);
+            throw e;
+        }
     }
 
     @Override

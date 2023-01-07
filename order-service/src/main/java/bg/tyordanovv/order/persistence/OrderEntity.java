@@ -29,20 +29,20 @@ public class OrderEntity {
     private String number;
     private double price;
     @OneToMany(mappedBy = "order")
-    private Set<OrderDetailsEntity> orderedProductEntities = new HashSet<>();
+    private Set<OrderDetailsEntity> orderDetails = new HashSet<>();
 
     public OrderEntity(
+            Long orderNumber,
             String firstName,
             String lastName,
             String email,
-            String number,
-            Set<OrderDetailsEntity> orderedProductEntities
+            String number
     ){
+        this.orderNumber = orderNumber;
         this.createdOn = LocalTime.now();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.number = number;
-        this.orderedProductEntities = orderedProductEntities;
     }
 }

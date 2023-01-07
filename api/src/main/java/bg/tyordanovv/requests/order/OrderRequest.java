@@ -10,7 +10,7 @@ public record OrderRequest(
         String lastName,
         String email,
         String number,
-        List<OrderedProductDTO> productList,
-        DestinationAddress address
+        String address,
+        List<OrderedProductDTO> productList
 ) {
 }
