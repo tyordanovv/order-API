@@ -11,7 +11,6 @@ import lombok.Setter;
 @Table(name = "products")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class ProductEntity {
     @Id
@@ -20,8 +19,26 @@ public class ProductEntity {
     @Version
     private int version;
     private String name;
+    private String description;
     private ProductType type;
+    private double price;
     private double weight;
     private int quantity;
-    private double review;
+
+    public ProductEntity(
+            String name,
+            String description,
+            ProductType type,
+            double price,
+            double weight,
+            int quantity
+    ) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
+        this.price = price;
+        this.weight = weight;
+        this.quantity = quantity;
+    }
+//    private Long reviewId; TODO: add review service
 }

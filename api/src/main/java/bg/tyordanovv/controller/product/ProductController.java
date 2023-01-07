@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-public interface ProductController {
+public interface ProductController extends ProductQuantity {
 
     @GetMapping("/api/v1/product/category/{category}")
     List<ProductSummaryResponse> getProductByCategory(@PathVariable("category") String category);
@@ -24,4 +24,11 @@ public interface ProductController {
 
     @PostMapping(value = "/api/v1/product/edit/{productId}")
     void editProduct(@PathVariable("productId") Long productId);
+
+    @GetMapping(
+            value = "/api/v1/product/{productId}",
+            produces = "application/json")
+    ProductSummaryResponse getProductSummaryByID(@PathVariable("productId") Long productId);
+
+
 }

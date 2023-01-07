@@ -1,15 +1,19 @@
 package bg.tyordanovv.order.service;
 
 import bg.tyordanovv.controller.order.OrderController;
+import bg.tyordanovv.core.delivery.DeliverySummary;
+import bg.tyordanovv.exceptions.NotFoundException;
+import bg.tyordanovv.order.persistence.OrderEntity;
+import bg.tyordanovv.order.persistence.OrderRepository;
 import bg.tyordanovv.requests.order.OrderRequest;
-import bg.tyordanovv.requests.product.ProductQuantityRequest;
 import bg.tyordanovv.responses.order.OrderSummaryResponse;
-import bg.tyordanovv.responses.product.ProductSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -17,6 +21,8 @@ public class OrderServiceImpl implements OrderController {
 
     @Autowired
     private OrderManagementIntegration integrationOrder;
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Override
     public void createOrder(OrderRequest body) {
@@ -36,20 +42,37 @@ public class OrderServiceImpl implements OrderController {
 
     @Override
     public List<OrderSummaryResponse> getUserOrders(String email) {
-        return null;
+        List<OrderSummaryResponse> orderSummaryResponses = new ArrayList<>();
+
+        List<OrderEntity> orderEntities = orderRepository.findByEmail(email);
+        orderEntities
+                .forEach(e -> {
+                    List<DeliverySummary> deliverySummary = integrationOrder.getAllDeliverySummary(e.getId());
+                    orderSummaryResponses.add(
+                            new OrderSummaryResponse(
+                                    e.getId(),
+                                    e.getOrderNumber(),
+                                    e.getCreatedOn(),
+                                    e.getPrice(),
+                                    deliverySummary
+                            )
+                    );
+                });
+        return orderSummaryResponses;
     }
 
     @Override
     public OrderSummaryResponse getOrder(Long orderId) {
-//        Mono<DeliveryStatus> status = integration.getDeliveryStatus(orderId);
-        ProductSummaryResponse product = integrationOrder.getProductByID(orderId);
-        System.out.println(product);
-        log.info("out OrderServiceImplementation");
+        List<DeliverySummary> deliverySummary = integrationOrder.getAllDeliverySummary(orderId);
+        OrderEntity orderEntity = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("No order found with this ID!"));
+
         return new OrderSummaryResponse(
-                5L,
-                "done",
-                "Peter",
-                "John",
-                List.of(new ProductQuantityRequest(product.id(), product.name(), product.orderedQuantity())));
+                orderEntity.getId(),
+                orderEntity.getOrderNumber(),
+                orderEntity.getCreatedOn(),
+                orderEntity.getPrice(),
+                deliverySummary
+        );
     }
 }

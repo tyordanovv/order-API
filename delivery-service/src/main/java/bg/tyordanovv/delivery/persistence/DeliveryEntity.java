@@ -22,7 +22,11 @@ public class DeliveryEntity {
     @Version
     private int version;
     @ManyToOne(targetEntity = DeliveryAddress.class)
-    private DestinationAddress address;
+    private DeliveryAddress address;
     private Date lastUpdate;
     private Long orderId;
+    private Long productId;
+    private String productName;
+    private int orderedAmount;
+
 }

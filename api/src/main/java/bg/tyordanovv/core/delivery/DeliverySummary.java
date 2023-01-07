@@ -9,7 +9,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class DeliveryStatus {
+public class DeliverySummary {
+    private Long id;
     private DeliveryStatusEnum status;
     private Date lastChange;
 }

@@ -1,18 +1,28 @@
 package bg.tyordanovv.product.service;
 
 import bg.tyordanovv.controller.product.ProductController;
-import bg.tyordanovv.controller.product.ProductSummaryController;
+import bg.tyordanovv.product.persistence.ProductEntity;
+import bg.tyordanovv.product.persistence.ProductRepository;
 import bg.tyordanovv.requests.product.CreateProductRequest;
-import bg.tyordanovv.requests.product.ProductQuantityRequest;
+import bg.tyordanovv.requests.product.OrderedProductDTO;
 import bg.tyordanovv.responses.product.ProductSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @Slf4j
 @RestController
-public class ProductService implements ProductController, ProductSummaryController {
+public class ProductService implements ProductController {
+    private final ProductRepository repository;
+
+    @Autowired
+    public ProductService(
+            ProductRepository repository
+    ){
+        this.repository = repository;
+    }
 
     @Override
     public List<ProductSummaryResponse> getProductByCategory(String category) {
@@ -21,17 +31,23 @@ public class ProductService implements ProductController, ProductSummaryControll
     }
 
     @Override
-    public ProductSummaryResponse getProductByID(Long productId) {
-        log.info("product summary returned");
-
-//        return null;
-        return new ProductSummaryResponse(1L, "burger", 5.5, "burger description", "food", 4.4, 2);
-    }
-
-    @Override
     public void createProduct(CreateProductRequest request) {
-        log.info("product created");
-//        return null;
+        try {
+            ProductEntity product = new ProductEntity(
+                    request.name(),
+                    request.description(),
+                    request.type(),
+                    request.price(),
+                    request.weight(),
+                    request.quantity()
+            );
+            repository.save(product);
+            log.info("Successfully added new product");
+        }
+        catch (RuntimeException e) {
+            log.warn("create product failed", e);
+            throw e;
+        }
     }
 
     @Override
@@ -42,6 +58,16 @@ public class ProductService implements ProductController, ProductSummaryControll
 
     @Override
     public void editProduct(Long productId) {
+
+    }
+
+    @Override
+    public ProductSummaryResponse getProductSummaryByID(Long productId) {
+        return null;
+    }
+
+    @Override
+    public void editProductQuantity(List<OrderedProductDTO> productList) {
 
     }
 }

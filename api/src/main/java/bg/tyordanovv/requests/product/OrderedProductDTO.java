@@ -1,5 +1,5 @@
 package bg.tyordanovv.requests.product;
 
 //@AllArgsConstructor
-public record ProductQuantityRequest
+public record OrderedProductDTO
         (Long id, String name, int quantity){}

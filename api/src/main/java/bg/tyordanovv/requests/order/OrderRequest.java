@@ -1,7 +1,7 @@
 package bg.tyordanovv.requests.order;
 
 import bg.tyordanovv.address.DestinationAddress;
-import bg.tyordanovv.requests.product.ProductQuantityRequest;
+import bg.tyordanovv.requests.product.OrderedProductDTO;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record OrderRequest(
         String lastName,
         String email,
         String number,
-        List<ProductQuantityRequest> productList,
+        List<OrderedProductDTO> productList,
         DestinationAddress address
 ) {
 }
