@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface DeliveryController {
 
-    void createDelivery(@RequestBody(required = false) CreateDeliveryRequest request);
+    @PostMapping("api/v1/delivery/create")
+    void createDelivery(@RequestBody CreateDeliveryRequest request);
 
-    @PostMapping("" +
-            "cancel/{deliveryId}")
+    @PostMapping("api/v1/delivery/cancel/{deliveryId}")
     void cancelDelivery(@PathVariable("deliveryId") Long deliveryId);
 
     @GetMapping("api/v1/delivery/get-status/{deliveryId}")

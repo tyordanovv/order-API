@@ -16,7 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -60,27 +62,27 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     @Override
     public void createDelivery(CreateDeliveryRequest body) {
         try {
-            log.debug("creates a new composite entity for order");
+            log.debug("creates a new delivery for list of items");
+            try {
+                String url = DELIVERY_SERVICE_URL + "create";
+                log.debug("Will call createDelivery API on URL: {}", url);
 
-            OrderEntity order = new OrderEntity();
+                ResponseEntity<CreateDeliveryRequest> response = restTemplate
+                        .postForEntity(url, body, CreateDeliveryRequest.class);
 
-//            integration.createProduct(product);
-//
-//            if (body.getRecommendations() != null) {
-//                body.getRecommendations().forEach(r -> {
-//                    Recommendation recommendation = new Recommendation(body.getProductId(), r.getRecommendationId(), r.getAuthor(), r.getRate(), r.getContent(), null);
-//                    integration.createRecommendation(recommendation);
-//                });
-//            }
-//
-//            if (body.getReviews() != null) {
-//                body.getReviews().forEach(r -> {
-//                    Review review = new Review(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent(), null);
-//                    integration.createReview(review);
-//                });
-//            }
+                log.debug("Created delivery with status {}", response.getStatusCode());
+            } catch (HttpClientErrorException e){
+                HttpStatusCode statusCode = e.getStatusCode();
 
-            log.debug("create order entity: {}", order.getId());
+                if (statusCode.equals(NOT_FOUND)) {
+                    throw new NotFoundException(getErrorMessage(e));
+                } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+                    throw new InvalidInputException(getErrorMessage(e));
+                } else {
+                    log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
+                    log.warn("Error body: {}", e.getResponseBodyAsString());
+                }
+            }
 
         } catch (RuntimeException e) {
             log.warn("create order failed", e);
@@ -102,7 +104,7 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
             log.debug("Will call getDeliverySummary API on URL: {}", url);
 
             deliverySummary = restTemplate.getForObject(url, DeliverySummary.class);
-            log.debug("Found a product with id: {}", deliverySummary.getId());
+            log.debug("Found a product with id: {}", deliverySummary.id());
         } catch (HttpClientErrorException e){
             HttpStatusCode statusCode = e.getStatusCode();
 

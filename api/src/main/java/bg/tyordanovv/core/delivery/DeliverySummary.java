@@ -1,16 +1,5 @@
 package bg.tyordanovv.core.delivery;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.time.LocalTime;
 
-import java.util.Date;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-public class DeliverySummary {
-    private Long id;
-    private DeliveryStatusEnum status;
-    private Date lastChange;
-}
+public record DeliverySummary(Long id, DeliveryStatusEnum status, LocalTime lastChange) {}

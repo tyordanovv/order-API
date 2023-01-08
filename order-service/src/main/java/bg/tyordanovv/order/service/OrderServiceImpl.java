@@ -7,6 +7,7 @@ import bg.tyordanovv.order.persistence.OrderDetailsEntity;
 import bg.tyordanovv.order.persistence.OrderDetailsRepository;
 import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.order.persistence.OrderRepository;
+import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.order.OrderRequest;
 import bg.tyordanovv.responses.order.OrderSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class OrderServiceImpl implements OrderController {
                     body.number()
             );
 
-            //TODO: add check if product is available and get final price
+            //TODO: add check if product is available and get final price and weight
 
             Set<OrderDetailsEntity> listOfOrderDetails = new HashSet<>();
             body.productList()
@@ -62,6 +63,8 @@ public class OrderServiceImpl implements OrderController {
             orderRepository.save(order);
 
             //TODO MQ -> delivery service
+            integrationOrder.createDelivery(
+                    new CreateDeliveryRequest(order.getId(), body.productList(), 10, body.address()));
 
             log.debug("create order entity: {}", order.getId());
 
