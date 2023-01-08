@@ -17,8 +17,8 @@ public interface DeliveryController {
     @PostMapping("api/v1/delivery/cancel/{deliveryId}")
     void cancelDelivery(@PathVariable("deliveryId") Long deliveryId);
 
-    @GetMapping("api/v1/delivery/get-status/{deliveryId}")
-    DeliverySummary getDeliverySummary(@PathVariable Long deliveryId);
+//    @GetMapping("api/v1/delivery/get-status/{deliveryId}")
+//    DeliverySummary getDeliverySummary(@PathVariable Long deliveryId);
 
     @GetMapping("api/v1/delivery/get-status/order/{orderId}")
     List<DeliverySummary> getAllDeliverySummary(@PathVariable Long orderId);

@@ -96,29 +96,29 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
 
     }
 
-    @Override
-    public DeliverySummary getDeliverySummary(Long deliveryId) {
-        DeliverySummary deliverySummary = null;
-        try {
-            String url = DELIVERY_SERVICE_URL + "get-status/" + deliveryId;
-            log.debug("Will call getDeliverySummary API on URL: {}", url);
-
-            deliverySummary = restTemplate.getForObject(url, DeliverySummary.class);
-            log.debug("Found a product with id: {}", deliverySummary.id());
-        } catch (HttpClientErrorException e){
-            HttpStatusCode statusCode = e.getStatusCode();
-
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(e));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(e));
-            } else {
-                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                log.warn("Error body: {}", e.getResponseBodyAsString());
-            }
-        }
-        return deliverySummary;
-    }
+//    @Override
+//    public DeliverySummary getDeliverySummary(Long deliveryId) {
+//        DeliverySummary deliverySummary = null;
+//        try {
+//            String url = DELIVERY_SERVICE_URL + "get-status/" + deliveryId;
+//            log.debug("Will call getDeliverySummary API on URL: {}", url);
+//
+//            deliverySummary = restTemplate.getForObject(url, DeliverySummary.class);
+//            log.debug("Found a product with id: {}", deliverySummary.id());
+//        } catch (HttpClientErrorException e){
+//            HttpStatusCode statusCode = e.getStatusCode();
+//
+//            if (statusCode.equals(NOT_FOUND)) {
+//                throw new NotFoundException(getErrorMessage(e));
+//            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+//                throw new InvalidInputException(getErrorMessage(e));
+//            } else {
+//                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
+//                log.warn("Error body: {}", e.getResponseBodyAsString());
+//            }
+//        }
+//        return deliverySummary;
+//    }
 
     @Override
     public List<DeliverySummary> getAllDeliverySummary(Long orderId) {
