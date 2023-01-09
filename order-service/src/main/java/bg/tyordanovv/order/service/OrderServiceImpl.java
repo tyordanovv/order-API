@@ -9,6 +9,7 @@ import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.order.persistence.OrderRepository;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.order.OrderRequest;
+import bg.tyordanovv.requests.product.ReturnProductRequest;
 import bg.tyordanovv.responses.order.OrderSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class OrderServiceImpl implements OrderController {
             Set<OrderDetailsEntity> listOfOrderDetails = new HashSet<>();
             body.productList()
                     .forEach(e -> listOfOrderDetails.add(
-                            new OrderDetailsEntity(order, e.id(), e.quantity(), false, 2)
+                            new OrderDetailsEntity(order, e.id(), e.quantity(), 2)
                     ));
 
             order.setOrderDetails(listOfOrderDetails);
@@ -75,13 +76,23 @@ public class OrderServiceImpl implements OrderController {
     }
 
     @Override
-    public void cancelOrder(Long orderId) {
-//        return null;
+    public void cancelOrder(Long deliveryId) {
+        try {
+            integrationOrder.cancelDelivery(deliveryId);
+        } catch (RuntimeException e) {
+            log.warn("ERROR canceling order with id {}", deliveryId, e);
+            throw e;
+        }
     }
 
     @Override
-    public void returnOrder(Long orderId) {
-//        return null;
+    public void returnProduct(ReturnProductRequest request) {
+        try {
+            integrationOrder.returnProduct(request);
+        } catch (RuntimeException e) {
+            log.warn("ERROR returning delivery with id {}", request.deliveryId(), e);
+            throw e;
+        }
     }
 
     @Override

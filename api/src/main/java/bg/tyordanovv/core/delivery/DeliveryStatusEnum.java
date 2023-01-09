@@ -6,5 +6,6 @@ public enum DeliveryStatusEnum {
     DELIVERED,
     CANCELED,
     RETURNED,
-    NON_AVAILABLE
+    NON_AVAILABLE,
+    RETURN_LABELS_SEND
 }

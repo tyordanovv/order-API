@@ -11,6 +11,7 @@ import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.product.OrderedProductDTO;
+import bg.tyordanovv.requests.product.ReturnProductRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,7 +30,7 @@ import java.util.List;
 
 import static ch.qos.logback.core.util.AggregationType.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 
 @Slf4j
 @Component
@@ -62,63 +64,48 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     @Override
     public void createDelivery(CreateDeliveryRequest body) {
         try {
-            log.debug("creates a new delivery for list of items");
-            try {
-                String url = DELIVERY_SERVICE_URL + "create";
-                log.debug("Will call createDelivery API on URL: {}", url);
+            String url = DELIVERY_SERVICE_URL + "create";
+            log.debug("Will call createDelivery API on URL: {}", url);
 
-                ResponseEntity<CreateDeliveryRequest> response = restTemplate
-                        .postForEntity(url, body, CreateDeliveryRequest.class);
+            ResponseEntity<CreateDeliveryRequest> response = restTemplate
+                    .postForEntity(url, body, CreateDeliveryRequest.class);
 
-                log.debug("Created delivery with status {}", response.getStatusCode());
-            } catch (HttpClientErrorException e){
-                HttpStatusCode statusCode = e.getStatusCode();
+            log.debug("Created delivery with status {}", response.getStatusCode());
+        } catch (HttpClientErrorException e){
+            HttpStatusCode statusCode = e.getStatusCode();
 
-                if (statusCode.equals(NOT_FOUND)) {
-                    throw new NotFoundException(getErrorMessage(e));
-                } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                    throw new InvalidInputException(getErrorMessage(e));
-                } else {
-                    log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                    log.warn("Error body: {}", e.getResponseBodyAsString());
-                }
+            if (statusCode.equals(NOT_FOUND)) {
+                throw new NotFoundException(getErrorMessage(e));
+            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+                throw new InvalidInputException(getErrorMessage(e));
+            } else {
+                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
+                log.warn("Error body: {}", e.getResponseBodyAsString());
             }
-
-        } catch (RuntimeException e) {
-            log.warn("create order failed", e);
-            throw e;
         }
     }
 
     @Override
     public void cancelDelivery(Long deliveryId) {
-        log.info("order mng cancel delivery");
+        try {
+            String url = DELIVERY_SERVICE_URL + "cancel/" + deliveryId;
+            log.debug("Will call cancelDelivery API on URL: {}", url);
 
+            restTemplate.exchange(url, POST, null, Void.class);
+
+        } catch (HttpClientErrorException e){
+            HttpStatusCode statusCode = e.getStatusCode();
+
+            if (statusCode.equals(NOT_FOUND)) {
+                throw new NotFoundException(getErrorMessage(e));
+            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+                throw new InvalidInputException(getErrorMessage(e));
+            } else {
+                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
+                log.warn("Error body: {}", e.getResponseBodyAsString());
+            }
+        }
     }
-
-//    @Override
-//    public DeliverySummary getDeliverySummary(Long deliveryId) {
-//        DeliverySummary deliverySummary = null;
-//        try {
-//            String url = DELIVERY_SERVICE_URL + "get-status/" + deliveryId;
-//            log.debug("Will call getDeliverySummary API on URL: {}", url);
-//
-//            deliverySummary = restTemplate.getForObject(url, DeliverySummary.class);
-//            log.debug("Found a product with id: {}", deliverySummary.id());
-//        } catch (HttpClientErrorException e){
-//            HttpStatusCode statusCode = e.getStatusCode();
-//
-//            if (statusCode.equals(NOT_FOUND)) {
-//                throw new NotFoundException(getErrorMessage(e));
-//            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-//                throw new InvalidInputException(getErrorMessage(e));
-//            } else {
-//                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-//                log.warn("Error body: {}", e.getResponseBodyAsString());
-//            }
-//        }
-//        return deliverySummary;
-//    }
 
     @Override
     public List<DeliverySummary> getAllDeliverySummary(Long orderId) {
@@ -163,5 +150,29 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     @Override
     public void send(EmailType type, String request) {
 
+    }
+
+    public void returnProduct(ReturnProductRequest product) {
+        try {
+            String url = DELIVERY_SERVICE_URL + "return";
+            log.debug("Will call returnDelivery API on URL: {}", url);
+
+            ResponseEntity<ReturnProductRequest> response = restTemplate
+                    .postForEntity(url, product, ReturnProductRequest.class);
+
+            log.debug("Returned delivery with status {}", response.getStatusCode());
+
+        } catch (HttpClientErrorException e){
+            HttpStatusCode statusCode = e.getStatusCode();
+
+            if (statusCode.equals(NOT_FOUND)) {
+                throw new NotFoundException(getErrorMessage(e));
+            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
+                throw new InvalidInputException(getErrorMessage(e));
+            } else {
+                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
+                log.warn("Error body: {}", e.getResponseBodyAsString());
+            }
+        }
     }
 }

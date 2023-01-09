@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -15,7 +16,6 @@ import java.util.Date;
 @Table(name = "deliveries")
 @NoArgsConstructor
 @Getter
-@Setter
 public class DeliveryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +26,7 @@ public class DeliveryEntity {
     @Column(name = "address")
     private String address;
     @Column(name = "last_update")
-    private LocalTime lastUpdate;
+    private LocalDate lastUpdate;
     @Column(name = "order_id")
     private Long orderId;
     @Column(name = "product_id")
@@ -46,7 +46,7 @@ public class DeliveryEntity {
             int orderedAmount
     ){
         this.address = address;
-        this.lastUpdate = LocalTime.now();
+        this.lastUpdate = LocalDate.now();
         this.orderId = orderId;
         this.productId = productId;
         this.productName = productName;
@@ -54,4 +54,15 @@ public class DeliveryEntity {
         this.status = DeliveryStatusEnum.PROCESSING;
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setStatus(DeliveryStatusEnum status) {
+        this.status = status;
+        this.lastUpdate = LocalDate.now();
+    }
+
+    public void setQuantity(int quantity) {
+    }
 }

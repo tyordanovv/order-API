@@ -4,6 +4,7 @@ package bg.tyordanovv.controller.delivery;
 
 import bg.tyordanovv.core.delivery.DeliverySummary;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
+import bg.tyordanovv.requests.product.ReturnProductRequest;
 import bg.tyordanovv.responses.delivery.DeliverySummaryList;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,9 @@ public interface DeliveryController {
 
     @PostMapping("api/v1/delivery/cancel/{deliveryId}")
     void cancelDelivery(@PathVariable("deliveryId") Long deliveryId);
+
+    @PostMapping("api/v1/delivery/return")
+    void returnProduct(@RequestBody ReturnProductRequest request);
 
 //    @GetMapping("api/v1/delivery/get-status/{deliveryId}")
 //    DeliverySummary getDeliverySummary(@PathVariable Long deliveryId);

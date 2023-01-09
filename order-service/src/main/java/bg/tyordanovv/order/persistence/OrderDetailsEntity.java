@@ -34,13 +34,12 @@ public class OrderDetailsEntity {
             OrderEntity order,
             Long productId,
             int quantity,
-            boolean isDelivered,
             double unitPrice
     ){
         this.order = order;
         this.productId = productId;
         this.quantity = quantity;
-        this.isDelivered = isDelivered;
+        this.isDelivered = false;
         this.unitPrice = unitPrice;
     }
 }

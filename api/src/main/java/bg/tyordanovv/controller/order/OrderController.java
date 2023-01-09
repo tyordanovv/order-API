@@ -1,6 +1,7 @@
 package bg.tyordanovv.controller.order;
 
 import bg.tyordanovv.requests.order.OrderRequest;
+import bg.tyordanovv.requests.product.ReturnProductRequest;
 import bg.tyordanovv.responses.order.OrderSummaryResponse;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,12 +21,12 @@ public interface OrderController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     void createOrder(@RequestBody OrderRequest body);
 
-    @PostMapping(value = "/api/v1/order/cancel/{orderId}")
-    void cancelOrder(@PathVariable Long orderId);
-    @PostMapping(value ="/api/v1/order/return/{orderId}")
-    void returnOrder(@PathVariable Long orderId);
+    @PostMapping(value = "/api/v1/order/cancel/{deliveryId}")
+    void cancelOrder(@PathVariable Long deliveryId);
+    @PostMapping(value ="/api/v1/order/return")
+    void returnProduct(@RequestBody ReturnProductRequest request);
 
-    @GetMapping(value = "/api/v1/order/user{email}")
+    @GetMapping(value = "/api/v1/order/user/{email}")
     List<OrderSummaryResponse> getUserOrders(@PathVariable String email);
 
 //    @Operation(
