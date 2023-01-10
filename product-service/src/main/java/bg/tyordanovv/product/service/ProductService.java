@@ -1,6 +1,7 @@
 package bg.tyordanovv.product.service;
 
 import bg.tyordanovv.controller.product.ProductController;
+import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.product.persistence.ProductEntity;
 import bg.tyordanovv.product.persistence.ProductRepository;
 import bg.tyordanovv.requests.product.CreateProductRequest;
@@ -52,8 +53,12 @@ public class ProductService implements ProductController {
 
     @Override
     public void deleteProduct(Long productId) {
-        log.info("product deleted");
-//        return null;
+        if (productId < 1){
+            throw new InvalidInputException("Invalid product ID " + productId + ". ID should not be less than 1");
+        }
+
+        log.debug("Deletes product entity with productId {}", productId);
+        repository.delete(repository.findByProductId(productId));
     }
 
     @Override

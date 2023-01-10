@@ -7,5 +7,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Transactional(readOnly = true)
-    ProductEntity getById(Long id);
+    ProductEntity findByProductId(Long id);
 }
