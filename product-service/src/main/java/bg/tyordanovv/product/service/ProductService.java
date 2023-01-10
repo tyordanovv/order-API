@@ -10,8 +10,10 @@ import bg.tyordanovv.responses.product.ProductSummaryResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.logging.Level;
 
 @Slf4j
 @RestController
@@ -52,13 +54,16 @@ public class ProductService implements ProductController {
     }
 
     @Override
-    public void deleteProduct(Long productId) {
+    public Mono<Void> deleteProduct(Long productId) {
         if (productId < 1){
             throw new InvalidInputException("Invalid product ID " + productId + ". ID should not be less than 1");
         }
 
         log.debug("Deletes product entity with productId {}", productId);
-        repository.delete(repository.findByProductId(productId));
+        return repository.findByProductId(productId)
+                .log(log.getName(), Level.FINE)
+                .map(repository::delete)
+                .flatMap(e -> e);
     }
 
     @Override
