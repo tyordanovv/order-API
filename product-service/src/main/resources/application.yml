@@ -1,14 +1,19 @@
 server.port: 8083
 
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  datasource:
-    password: password
-    username: postgres
-    url: jdbc:postgresql://localhost:5432/product
+spring.data.mongodb:
+  host: localhost
+  port: 27017
+  database: product-db
+
+#spring:
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#  datasource:
+#    password: password
+#    username: postgres
+#    url: jdbc:postgresql://localhost:5432/product
 
 server.error.include-message: always
 
@@ -16,8 +21,11 @@ logging:
   level:
     root: INFO
     bg.tyordanovv: DEBUG
+    org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
 ---
 spring.config.activate.on-profile: docker
 
 server.port: 8080
+
+spring.data.mongodb.host: mongodb
