@@ -3,12 +3,11 @@ package bg.tyordanovv.order.service;
 import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.email.EmailController;
 import bg.tyordanovv.controller.product.ProductQuantity;
-import bg.tyordanovv.core.delivery.DeliverySummary;
+import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.core.email.EmailType;
 import bg.tyordanovv.exceptions.CustomHttpError;
 import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.exceptions.NotFoundException;
-import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.product.OrderedProductDTO;
 import bg.tyordanovv.requests.product.ReturnProductRequest;
@@ -17,9 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -108,14 +105,14 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     }
 
     @Override
-    public List<DeliverySummary> getAllDeliverySummary(Long orderId) {
-        List<DeliverySummary> deliverySummary = null;
+    public List<DeliveryDTO> getAllDeliverySummary(Long orderId) {
+        List<DeliveryDTO> deliveryDTO = null;
         try {
             String url = DELIVERY_SERVICE_URL + "get-status/order/" + orderId;
             log.debug("Will call getDeliverySummary API on URL: {}", url);
 
-            deliverySummary = restTemplate
-                    .exchange(url, GET, null, new ParameterizedTypeReference<List<DeliverySummary>>() {})
+            deliveryDTO = restTemplate
+                    .exchange(url, GET, null, new ParameterizedTypeReference<List<DeliveryDTO>>() {})
                     .getBody();
 
         } catch (HttpClientErrorException e){
@@ -130,7 +127,7 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
                 log.warn("Error body: {}", e.getResponseBodyAsString());
             }
         }
-        return deliverySummary;
+        return deliveryDTO;
     }
 
     @Override

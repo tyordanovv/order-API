@@ -1,35 +1,38 @@
 package bg.tyordanovv.controller.product;
 
+import bg.tyordanovv.core.product.ProductDTO;
+import bg.tyordanovv.core.product.ProductType;
 import bg.tyordanovv.requests.product.*;
-import bg.tyordanovv.responses.product.ProductSummaryResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-
+@RequestMapping("/api/v1/products/")
 public interface ProductController extends ProductQuantity {
 
-    @GetMapping("/api/v1/product/category/{category}")
-    List<ProductSummaryResponse> getProductByCategory(@PathVariable("category") String category);
+    @GetMapping("category/{category}")
+    Flux<ProductDTO> getProductByCategory(@PathVariable("category") ProductType category);
 
-    @PostMapping(
-            value = "/api/v1/product/create",
-            consumes = "application/json")
+    @PostMapping(consumes = "application/json")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void createProduct(@RequestBody(required = false) CreateProductRequest request);
+    Mono<ProductDTO> createProduct(@RequestBody CreateProductRequest request);
 
-    @PostMapping(value = "/api/v1/product/delete/{productId}")
+    @DeleteMapping(value = "{productId}")
     Mono<Void> deleteProduct(@PathVariable("productId") Long productId);
 
-    @PostMapping(value = "/api/v1/product/edit/{productId}")
-    void editProduct(@PathVariable("productId") Long productId);
+    @PostMapping(value = "{productId}")
+    Mono<Void> editProduct(@PathVariable("productId") Long productId);
+
+//    @GetMapping("{id}")
+//    Mono<>
 
     @GetMapping(
-            value = "/api/v1/product/{productId}",
+            value = "{productId}",
             produces = "application/json")
-    ProductSummaryResponse getProductSummaryByID(@PathVariable("productId") Long productId);
+    Mono<ProductDTO> getProductDTOByID(@PathVariable("productId") Long productId);
 
 
 }

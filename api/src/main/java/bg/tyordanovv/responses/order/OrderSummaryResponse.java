@@ -1,6 +1,6 @@
 package bg.tyordanovv.responses.order;
 
-import bg.tyordanovv.core.delivery.DeliverySummary;
+import bg.tyordanovv.core.delivery.DeliveryDTO;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -10,5 +10,5 @@ public record OrderSummaryResponse(
         Long oderNumber,
         LocalTime createdOn,
         double price,
-        List<DeliverySummary> deliveredProducts
+        List<DeliveryDTO> deliveredProducts
 ) {}

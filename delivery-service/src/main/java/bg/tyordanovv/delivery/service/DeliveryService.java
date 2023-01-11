@@ -3,12 +3,10 @@ package bg.tyordanovv.delivery.service;
 import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.delivery.DeliveryManagementController;
 import bg.tyordanovv.core.delivery.DeliveryStatusEnum;
-import bg.tyordanovv.core.delivery.DeliverySummary;
-import bg.tyordanovv.core.product.ProductSummary;
+import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.delivery.persistence.DeliveryEntity;
 import bg.tyordanovv.delivery.persistence.DeliveryRepository;
 import bg.tyordanovv.exceptions.BadRequestException;
-import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.delivery.UpdateDeliveryRequest;
@@ -20,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static bg.tyordanovv.core.delivery.DeliveryStatusEnum.*;
@@ -80,7 +76,7 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
     }
 
     @Override
-    public List<DeliverySummary> getAllDeliverySummary(Long orderId) {
+    public List<DeliveryDTO> getAllDeliverySummary(Long orderId) {
         log.info("get delivery status for order {}.", orderId);
         List<DeliveryEntity> deliveryEntities = repository
                 .findAllByOrderId(orderId).orElseThrow(
@@ -88,7 +84,7 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
                 );
         log.info("Delivery entities fetched.");
         return deliveryEntities.stream()
-                .map(d -> new DeliverySummary(d.getId(), d.getStatus(), d.getLastUpdate()))
+                .map(d -> new DeliveryDTO(d.getId(), d.getStatus(), d.getLastUpdate()))
                 .collect(Collectors.toList());
     }
 

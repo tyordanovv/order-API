@@ -20,7 +20,7 @@ public class ProductEntity {
     private int version;
 
     @Indexed(unique = true)
-    private Long productId;
+    private int productId;
     private String name;
     private String description;
     private ProductType type;

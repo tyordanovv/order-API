@@ -1,16 +1,11 @@
 package bg.tyordanovv.delivery.persistence;
 
-import bg.tyordanovv.address.DestinationAddress;
 import bg.tyordanovv.core.delivery.DeliveryStatusEnum;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "deliveries")

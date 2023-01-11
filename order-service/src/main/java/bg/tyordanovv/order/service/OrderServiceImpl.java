@@ -1,7 +1,7 @@
 package bg.tyordanovv.order.service;
 
 import bg.tyordanovv.controller.order.OrderController;
-import bg.tyordanovv.core.delivery.DeliverySummary;
+import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.order.persistence.OrderDetailsEntity;
 import bg.tyordanovv.order.persistence.OrderDetailsRepository;
@@ -102,14 +102,14 @@ public class OrderServiceImpl implements OrderController {
         List<OrderEntity> orderEntities = orderRepository.findByEmail(email);
         orderEntities
                 .forEach(e -> {
-                    List<DeliverySummary> deliverySummary = integrationOrder.getAllDeliverySummary(e.getId());
+                    List<DeliveryDTO> deliveryDTO = integrationOrder.getAllDeliverySummary(e.getId());
                     orderSummaryResponses.add(
                             new OrderSummaryResponse(
                                     e.getId(),
                                     e.getOrderNumber(),
                                     e.getCreatedOn(),
                                     e.getPrice(),
-                                    deliverySummary
+                                    deliveryDTO
                             )
                     );
                 });
@@ -118,7 +118,7 @@ public class OrderServiceImpl implements OrderController {
 
     @Override
     public OrderSummaryResponse getOrder(Long orderId) {
-        List<DeliverySummary> deliverySummary = integrationOrder.getAllDeliverySummary(orderId);
+        List<DeliveryDTO> deliveryDTO = integrationOrder.getAllDeliverySummary(orderId);
         OrderEntity orderEntity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException("No order found with this ID!"));
 
@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderController {
                 orderEntity.getOrderNumber(),
                 orderEntity.getCreatedOn(),
                 orderEntity.getPrice(),
-                deliverySummary
+                deliveryDTO
         );
     }
 }

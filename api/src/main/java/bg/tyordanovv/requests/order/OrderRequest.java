@@ -1,6 +1,5 @@
 package bg.tyordanovv.requests.order;
 
-import bg.tyordanovv.address.DestinationAddress;
 import bg.tyordanovv.requests.product.OrderedProductDTO;
 
 import java.util.List;

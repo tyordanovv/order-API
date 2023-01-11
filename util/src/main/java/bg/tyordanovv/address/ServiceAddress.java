@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-@Component
 @Slf4j
-public class DestinationAddress {
+@Component
+public class ServiceAddress {
     private final String port;
 
     private String serviceAddress = null;
 
     @Autowired
-    public DestinationAddress(@Value("${server.port}") String port) {
+    public ServiceAddress(@Value("${server.port}") String port) {
 
         this.port = port;
     }
