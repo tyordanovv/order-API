@@ -6,8 +6,6 @@ import bg.tyordanovv.controller.product.ProductQuantity;
 import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.core.email.EmailType;
 import bg.tyordanovv.exceptions.CustomHttpError;
-import bg.tyordanovv.exceptions.InvalidInputException;
-import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.product.OrderedProductDTO;
 import bg.tyordanovv.requests.product.ReturnProductRequest;
@@ -15,19 +13,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.List;
-
-import static ch.qos.logback.core.util.AggregationType.NOT_FOUND;
-import static io.netty.handler.codec.http.HttpResponseStatus.UNPROCESSABLE_ENTITY;
-import static org.springframework.http.HttpMethod.*;
 
 @Slf4j
 @Component
@@ -36,14 +29,14 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     private final String PRODUCT_SERVICE_URL;
     private final String DELIVERY_SERVICE_URL;
     private final String EMAIL_SERVICE_URL;
-
-    private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
+
+    private final WebClient webClient;
 
     @Autowired
     public OrderManagementIntegration(
-            RestTemplate restTemplate,
             ObjectMapper mapper,
+            WebClient.Builder webClient,
             @Value("${app.product-service.host}") String productServiceHost,
             @Value("${app.product-service.port}") String productServicePort,
             @Value("${app.delivery-service.host}") String deliveryServiceHost,
@@ -51,87 +44,54 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
             @Value("${app.email-service.host}") String emailServiceHost,
             @Value("${app.email-service.port}") String emailServicePort
             ){
-        this.restTemplate = restTemplate;
         this.mapper = mapper;
+        this.webClient = webClient.build();
         this.PRODUCT_SERVICE_URL = "http://" + productServiceHost + ":" + productServicePort + "/api/v1/product/";
         this.DELIVERY_SERVICE_URL = "http://" + deliveryServiceHost + ":" + deliveryServicePort + "/api/v1/delivery/";
         this.EMAIL_SERVICE_URL = "http://" + emailServiceHost + ":" + emailServicePort;
     }
 
     @Override
-    public void createDelivery(CreateDeliveryRequest body) {
-        try {
-            String url = DELIVERY_SERVICE_URL + "create";
-            log.debug("Will call createDelivery API on URL: {}", url);
+    public Mono<Void> createDelivery(CreateDeliveryRequest body) {
+        String url = DELIVERY_SERVICE_URL;
 
-            ResponseEntity<CreateDeliveryRequest> response = restTemplate
-                    .postForEntity(url, body, CreateDeliveryRequest.class);
-
-            log.debug("Created delivery with status {}", response.getStatusCode());
-        } catch (HttpClientErrorException e){
-            HttpStatusCode statusCode = e.getStatusCode();
-
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(e));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(e));
-            } else {
-                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                log.warn("Error body: {}", e.getResponseBodyAsString());
-            }
-        }
+        log.debug("Will call the createDelivery API on URL: {}", url);
+        return webClient
+                .post()
+                .uri(url)
+                .body(Mono.just(body), CreateDeliveryRequest.class)
+                .retrieve()
+                .bodyToMono(Void.class);
     }
 
     @Override
-    public void cancelDelivery(Long deliveryId) {
-        try {
-            String url = DELIVERY_SERVICE_URL + "cancel/" + deliveryId;
-            log.debug("Will call cancelDelivery API on URL: {}", url);
+    public Mono<Void> cancelDelivery(Long deliveryId) {
+        String url = DELIVERY_SERVICE_URL + "cancel/" + deliveryId;
+        log.debug("Will call cancelDelivery API on URL: {}", url);
 
-            restTemplate.exchange(url, POST, null, Void.class);
-
-        } catch (HttpClientErrorException e){
-            HttpStatusCode statusCode = e.getStatusCode();
-
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(e));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(e));
-            } else {
-                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                log.warn("Error body: {}", e.getResponseBodyAsString());
-            }
-        }
+        return webClient
+                .post()
+                .uri(url)
+                .retrieve()
+                .bodyToMono(Void.class);
     }
 
     @Override
-    public List<DeliveryDTO> getAllDeliverySummary(Long orderId) {
-        List<DeliveryDTO> deliveryDTO = null;
-        try {
-            String url = DELIVERY_SERVICE_URL + "get-status/order/" + orderId;
-            log.debug("Will call getDeliverySummary API on URL: {}", url);
+    public Flux<DeliveryDTO> getAllDeliverySummary(Long orderId) {
+        String url = DELIVERY_SERVICE_URL + "get-status/order/" + orderId;
+        log.debug("Will call getDeliverySummary API on URL: {}", url);
 
-            deliveryDTO = restTemplate
-                    .exchange(url, GET, null, new ParameterizedTypeReference<List<DeliveryDTO>>() {})
-                    .getBody();
-
-        } catch (HttpClientErrorException e){
-            HttpStatusCode statusCode = e.getStatusCode();
-
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(e));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(e));
-            } else {
-                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                log.warn("Error body: {}", e.getResponseBodyAsString());
-            }
-        }
-        return deliveryDTO;
+        return webClient
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToFlux(DeliveryDTO.class);
     }
 
     @Override
     public void editProductQuantity(List<OrderedProductDTO> productList) {
+        //TODO edit product quantity method
+
         log.info("order mng editProductQuantity");
         //        return null;
     }
@@ -149,27 +109,14 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
 
     }
 
-    public void returnProduct(ReturnProductRequest product) {
-        try {
-            String url = DELIVERY_SERVICE_URL + "return";
-            log.debug("Will call returnDelivery API on URL: {}", url);
+    public Mono<Void> returnProduct(ReturnProductRequest body) {
+        String url = DELIVERY_SERVICE_URL + "return";
+        log.debug("Will call returnDelivery API on URL: {}", url);
 
-            ResponseEntity<ReturnProductRequest> response = restTemplate
-                    .postForEntity(url, product, ReturnProductRequest.class);
-
-            log.debug("Returned delivery with status {}", response.getStatusCode());
-
-        } catch (HttpClientErrorException e){
-            HttpStatusCode statusCode = e.getStatusCode();
-
-            if (statusCode.equals(NOT_FOUND)) {
-                throw new NotFoundException(getErrorMessage(e));
-            } else if (statusCode.equals(UNPROCESSABLE_ENTITY)) {
-                throw new InvalidInputException(getErrorMessage(e));
-            } else {
-                log.warn("UNEXPECTED HTTP ERROR: {}, ERROR WILL BE RETHROWN", e.getStatusCode());
-                log.warn("Error body: {}", e.getResponseBodyAsString());
-            }
-        }
-    }
+        return webClient
+                .post()
+                .uri(url)
+                .body(Mono.just(body), ReturnProductRequest.class)
+                .retrieve()
+                .bodyToMono(Void.class);    }
 }

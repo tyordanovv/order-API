@@ -6,14 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface OrderRepository extends CrudRepository<OrderEntity, Long> {
     @Transactional(readOnly = true)
-    List<OrderEntity> findByEmail(String email);
+    Set<OrderEntity> findByEmail(String email);
 
     @Transactional(readOnly = true)
-    List<OrderEntity> findByNumber(String number);
+    Set<OrderEntity> findByNumber(String number);
 
     @Transactional(readOnly = true)
     Optional<OrderEntity> findById(Long id);

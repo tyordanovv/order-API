@@ -17,7 +17,6 @@ public class DeliveryEntity {
     private Long id;
     @Version
     private int version;
-//    @ManyToOne(targetEntity = DeliveryAddress.class)
     @Column(name = "address")
     private String address;
     @Column(name = "last_update")

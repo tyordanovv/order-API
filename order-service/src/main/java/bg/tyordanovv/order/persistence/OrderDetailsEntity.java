@@ -2,10 +2,6 @@ package bg.tyordanovv.order.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.aspectj.weaver.ast.Or;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "order_details")

@@ -7,85 +7,115 @@ import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.delivery.persistence.DeliveryEntity;
 import bg.tyordanovv.delivery.persistence.DeliveryRepository;
 import bg.tyordanovv.exceptions.BadRequestException;
-import bg.tyordanovv.exceptions.NotFoundException;
+import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.delivery.UpdateDeliveryRequest;
 import bg.tyordanovv.requests.product.ReturnProductRequest;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import static bg.tyordanovv.core.delivery.DeliveryStatusEnum.*;
 
 @Slf4j
 @RestController
-@NoArgsConstructor
 public class DeliveryService implements DeliveryController, DeliveryManagementController {
-    @Autowired
     private DeliveryRepository repository;
 
+    private final DeliveryMapper mapper;
+
+    private final Scheduler jdbcScheduler;
+
+    public DeliveryService(
+            @Qualifier("jdbcScheduler") Scheduler jdbcScheduler,
+            DeliveryRepository repository,
+            DeliveryMapper mapper) {
+        this.jdbcScheduler = jdbcScheduler;
+        this.repository = repository;
+        this.mapper = mapper;
+    }
     @Override
-    public void createDelivery(CreateDeliveryRequest request) {
-        log.info("create delivery");
-        request.products().forEach(
+    public Mono<Void> createDelivery(CreateDeliveryRequest request) {
+        log.info("Calling createDelivery");
+        if (request.orderId() < 1) {
+            throw new InvalidInputException("Invalid orderId: " + request.orderId());
+        }
+        return Mono.fromRunnable(() -> internalCreateDelivery(request))
+                .subscribeOn(jdbcScheduler).then();
+    }
+
+    private void internalCreateDelivery(CreateDeliveryRequest request) {
+        log.info("Calling internalCreateReview");
+        try {
+            request.products().forEach(
                 e -> repository.save(
                         new DeliveryEntity(request.address(), request.orderId(), e.id(), e.name(), e.quantity()))
-        );
-    }
+            );
+            log.info("done");
 
-    @Override
-    @Transactional
-    public void cancelDelivery(Long deliveryId) {
-        DeliveryEntity delivery = repository.findById(deliveryId)
-                .orElseThrow(() -> new NotFoundException("Delivery with this id does not exist!"));
-
-        if (delivery.getStatus().equals(PROCESSING) || delivery.getStatus().equals(NON_AVAILABLE)){
-            delivery.setStatus(CANCELED);
-            repository.save(delivery);
-        } else if (delivery.getStatus().equals(CANCELED)){
-            throw new RuntimeException("Delivery is already canceled");
-        } else
-            throw new RuntimeException("Delivery could not be canceled! Current status is " +
-                    delivery.getStatus());
-
-    }
-
-    @Override
-    public void returnProduct(ReturnProductRequest request) {
-        DeliveryEntity delivery = repository.findById(request.deliveryId())
-                .orElseThrow(() -> new NotFoundException("Delivery with this productId does not exist!"));
-
-        LocalDate currentTime = LocalDate.now();
-        LocalDate currentDateMinus2Weeks = currentTime.minusWeeks(2);
-
-        if (delivery.getStatus().equals(DELIVERED)
-                && delivery.getLastUpdate().isAfter(currentDateMinus2Weeks)
-                && (delivery.getOrderedAmount() >= request.quantity())){
-            sendReturnLabels(delivery, request.quantity());
-        } else if (delivery.getStatus().equals(RETURN_LABELS_SEND)) {
-            //TODO send Labels
-        } else {
-            throw new BadRequestException("This item could not be returned!");
+        } catch (DataIntegrityViolationException dive) {
+            throw new InvalidInputException("Duplicate key, Order Id: " + request.orderId());
         }
     }
 
     @Override
-    public List<DeliveryDTO> getAllDeliverySummary(Long orderId) {
-        log.info("get delivery status for order {}.", orderId);
-        List<DeliveryEntity> deliveryEntities = repository
-                .findAllByOrderId(orderId).orElseThrow(
-                        () -> new NotFoundException("No deliveries were found with order id " + orderId)
-                );
-        log.info("Delivery entities fetched.");
-        return deliveryEntities.stream()
-                .map(d -> new DeliveryDTO(d.getId(), d.getStatus(), d.getLastUpdate()))
-                .collect(Collectors.toList());
+    @Transactional
+    public Mono<Void> cancelDelivery(Long deliveryId) {
+        //TODO add logic
+//        DeliveryEntity delivery = repository.findById(deliveryId)
+//                .orElseThrow(() -> new NotFoundException("Delivery with this id does not exist!"));
+//
+//        if (delivery.getStatus().equals(PROCESSING) || delivery.getStatus().equals(NON_AVAILABLE)){
+//            delivery.setStatus(CANCELED);
+//            repository.save(delivery);
+//        } else if (delivery.getStatus().equals(CANCELED)){
+//            throw new RuntimeException("Delivery is already canceled");
+//        } else
+//            throw new RuntimeException("Delivery could not be canceled! Current status is " +
+//                    delivery.getStatus());
+        return Mono.empty();
+    }
+
+    @Override
+    public Mono<Void> returnProduct(ReturnProductRequest request) {
+        //TODO add logic
+//        DeliveryEntity delivery = repository.findById(request.deliveryId())
+//                .orElseThrow(() -> new NotFoundException("Delivery with this productId does not exist!"));
+//
+//        LocalDate currentTime = LocalDate.now();
+//        LocalDate currentDateMinus2Weeks = currentTime.minusWeeks(2);
+//
+//        if (delivery.getStatus().equals(DELIVERED)
+//                && delivery.getLastUpdate().isAfter(currentDateMinus2Weeks)
+//                && (delivery.getOrderedAmount() >= request.quantity())){
+//            sendReturnLabels(delivery, request.quantity());
+//        } else if (delivery.getStatus().equals(RETURN_LABELS_SEND)) {
+//            //TODO send Labels
+//        } else {
+//            throw new BadRequestException("This item could not be returned!");
+//        }
+        return Mono.empty();
+    }
+
+    @Override
+    public Flux<DeliveryDTO> getAllDeliverySummary(Long orderId) {
+        //TODO add logic
+
+//        log.info("get delivery status for order {}.", orderId);
+//        List<DeliveryEntity> deliveryEntities = repository
+//                .findAllByOrderId(orderId).orElseThrow(
+//                        () -> new NotFoundException("No deliveries were found with order id " + orderId)
+//                );
+//        log.info("Delivery entities fetched.");
+//        return deliveryEntities.stream()
+//                .map(d -> new DeliveryDTO(d.getId(), d.getStatus(), d.getLastUpdate()))
+//                .collect(Collectors.toList());
+        return Flux.empty();
     }
 
     private void sendReturnLabels(DeliveryEntity delivery, int quantity) {
@@ -118,10 +148,13 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
     }
 
     @Override
-    public void updateDelivery(UpdateDeliveryRequest request) {
-        DeliveryEntity delivery = repository.findById(request.deliveryId())
-                .orElseThrow(() -> new NotFoundException("Delivery was not found with id" + request.deliveryId()));
-        delivery.setStatus(request.statusEnum());
-        repository.save(delivery);
+    public Mono<Void> updateDelivery(UpdateDeliveryRequest request) {
+        //TODO add logic + replace with DeliveryDTO
+
+//        DeliveryEntity delivery = repository.findById(request.deliveryId())
+//                .orElseThrow(() -> new NotFoundException("Delivery was not found with id" + request.deliveryId()));
+//        delivery.setStatus(request.statusEnum());
+//        repository.save(delivery);
+        return Mono.empty();
     }
 }

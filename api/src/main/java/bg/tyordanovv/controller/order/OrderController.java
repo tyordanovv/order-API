@@ -2,15 +2,18 @@ package bg.tyordanovv.controller.order;
 
 import bg.tyordanovv.requests.order.OrderRequest;
 import bg.tyordanovv.requests.product.ReturnProductRequest;
-import bg.tyordanovv.responses.order.OrderSummaryResponse;
+import bg.tyordanovv.responses.order.OrderDTO;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 //import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 
 //@Tag(name = "Order", description = "REST API for full order management.")
 public interface OrderController {
@@ -19,15 +22,15 @@ public interface OrderController {
             value = "/api/v1/order/create",
             consumes = "application/json")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void createOrder(@RequestBody OrderRequest body);
+    Mono<Void> createOrder(@RequestBody OrderRequest body);
 
     @PostMapping(value = "/api/v1/order/cancel/{deliveryId}")
-    void cancelOrder(@PathVariable Long deliveryId);
+    Mono<Void> cancelOrder(@PathVariable Long orderId);
     @PostMapping(value ="/api/v1/order/return")
-    void returnProduct(@RequestBody ReturnProductRequest request);
+    Mono<Void> returnProduct(@RequestBody ReturnProductRequest request);
 
     @GetMapping(value = "/api/v1/order/user/{email}")
-    List<OrderSummaryResponse> getUserOrders(@PathVariable String email);
+    Flux<OrderDTO> getUserOrders(@PathVariable String email);
 
 //    @Operation(
 //            summary = "${api.order.get-order.description}",
@@ -46,5 +49,5 @@ public interface OrderController {
      * @return
      */
     @GetMapping(value = "/api/v1/order/{orderId}")
-    OrderSummaryResponse getOrder(@PathVariable Long id);
+    Mono<OrderDTO> getOrder(@PathVariable Long id);
 }

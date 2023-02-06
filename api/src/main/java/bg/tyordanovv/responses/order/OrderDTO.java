@@ -5,7 +5,7 @@ import bg.tyordanovv.core.delivery.DeliveryDTO;
 import java.time.LocalTime;
 import java.util.List;
 
-public record OrderSummaryResponse(
+public record OrderDTO(
         Long id,
         Long oderNumber,
         LocalTime createdOn,

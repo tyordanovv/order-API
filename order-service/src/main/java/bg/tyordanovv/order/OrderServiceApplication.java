@@ -6,26 +6,43 @@ package bg.tyordanovv.order;
 //import io.swagger.v3.oas.models.info.Info;
 //import io.swagger.v3.oas.models.info.License;
 //import io.swagger.v3.oas.models.servers.Server;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
 @SpringBootApplication
+@Slf4j
 public class OrderServiceApplication {
-
-    @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(OrderServiceApplication.class, args);
     }
 
+    private final Integer threadPoolSize;
+    private final Integer taskQueueSize;
+
+    @Autowired
+    public OrderServiceApplication(
+            @Value("${app.threadPoolSize:10}") Integer threadPoolSize,
+            @Value("${app.taskQueueSize:100}") Integer taskQueueSize
+    ) {
+        this.threadPoolSize = threadPoolSize;
+        this.taskQueueSize = taskQueueSize;
+    }
+
+    @Bean
+    public Scheduler jdbcScheduler() {
+        log.info("Creates a jdbcScheduler with thread pool size = {}", threadPoolSize);
+        return Schedulers.newBoundedElastic(threadPoolSize, taskQueueSize, "jdbc-pool");
+    }
 //    @Value("${api.common.version}")                 String applicationVersion;
 //    @Value("${api.common.title}")                   String title;
 //    @Value("${api.common.description}")             String description;
