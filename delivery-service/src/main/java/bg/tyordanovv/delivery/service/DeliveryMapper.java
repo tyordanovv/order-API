@@ -11,10 +11,11 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DeliveryMapper {
 
-    @Mappings({
-            @Mapping(target = "serviceAddress", ignore = true)
-    })
-    DeliveryDTO entityToApi(DeliveryEntity entity);
+    //TODO fix issue with serviceAddress and implement mapper
+//    @Mappings({
+//            @Mapping(target = "serviceAddress", ignore = true)
+//    })
+//    DeliveryDTO entityToApi(DeliveryEntity entity);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
