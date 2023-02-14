@@ -1,5 +1,6 @@
 package bg.tyordanovv.delivery.service;
 
+import bg.tyordanovv.address.ServiceAddress;
 import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.delivery.DeliveryManagementController;
 import bg.tyordanovv.core.delivery.DeliveryStatusEnum;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static bg.tyordanovv.core.delivery.DeliveryStatusEnum.*;
@@ -35,14 +37,19 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
     private final DeliveryMapper mapper;
 
     private final Scheduler jdbcScheduler;
+//    private final ServiceAddress serviceAddress;
+
 
     public DeliveryService(
             @Qualifier("jdbcScheduler") Scheduler jdbcScheduler,
             DeliveryRepository repository,
-            DeliveryMapper mapper) {
+            DeliveryMapper mapper
+//            ,ServiceAddress serviceAddress
+    ) {
         this.jdbcScheduler = jdbcScheduler;
         this.repository = repository;
         this.mapper = mapper;
+//        this.serviceAddress = serviceAddress;
     }
     @Override
     public Mono<Void> createDelivery(CreateDeliveryRequest request) {
@@ -132,18 +139,22 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
 
     @Override
     public Flux<DeliveryDTO> getAllDeliverySummary(Long orderId) {
-        //TODO add logic
-
-//        log.info("get delivery status for order {}.", orderId);
-//        List<DeliveryEntity> deliveryEntities = repository
-//                .findAllByOrderId(orderId).orElseThrow(
-//                        () -> new NotFoundException("No deliveries were found with order id " + orderId)
-//                );
-//        log.info("Delivery entities fetched.");
-//        return deliveryEntities.stream()
-//                .map(d -> new DeliveryDTO(d.getId(), d.getStatus(), d.getLastUpdate()))
-//                .collect(Collectors.toList());
-        return Flux.empty();
+        log.info("get delivery status for order {}.", orderId);
+        return Mono.fromCallable(() -> repository.findAllByOrderId(orderId))
+                .subscribeOn(jdbcScheduler)
+                .flatMapMany(deliveryEntities -> {
+                    List<DeliveryEntity> list = deliveryEntities.orElseThrow(() ->
+                            new NotFoundException("No deliveries were found with order id " + orderId));
+                    log.info("Delivery entities fetched.");
+                    return Flux.fromIterable(list)
+                            .map(d -> new DeliveryDTO(
+                                    d.getId(),
+                                    d.getAddress(),
+                                    d.getLastUpdate(),
+                                    d.getStatus()
+//                                    ,serviceAddress.getServiceAddress()
+                            ));
+                });
     }
 
     private void sendReturnLabels(DeliveryEntity delivery, int quantity) {

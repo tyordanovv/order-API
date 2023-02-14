@@ -9,6 +9,6 @@ public record DeliveryDTO(
         Long id,
         String address,
         LocalDate lastUpdate,
-        DeliveryStatusEnum status,
-        String serviceAddress
+        DeliveryStatusEnum status
+//        ,String serviceAddress
         ) {}

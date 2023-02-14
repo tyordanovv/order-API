@@ -1,6 +1,5 @@
 package bg.tyordanovv.order.core;
 
-import bg.tyordanovv.address.ServiceAddress;
 import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.order.persistence.OrderDetailsEntity;
@@ -8,7 +7,6 @@ import bg.tyordanovv.order.persistence.OrderDetailsRepository;
 import bg.tyordanovv.order.persistence.OrderEntity;
 import bg.tyordanovv.order.persistence.OrderRepository;
 import bg.tyordanovv.requests.order.OrderRequest;
-import bg.tyordanovv.responses.order.OrderDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
