@@ -56,13 +56,14 @@ public class OrderManagementServiceImpl implements OrderController {
     }
 
     @Override
-    public Mono<Void> cancelOrder(Long orderId) {
+    public Mono<Void> cancelOrder(Long deliveryId) {
+        System.out.println("TUKA" + deliveryId);
         try {
-            return integrationOrder.cancelDelivery(orderId)
-                    .doOnError(ex -> log.warn("create order failed: {}", ex.toString()))
+            return integrationOrder.cancelDelivery(deliveryId)
+                    .doOnError(ex -> log.warn("cancel deliveryId failed: {}", ex.toString()))
                     .log(log.getName(), FINE).then();
         } catch (RuntimeException e) {
-            log.warn("ERROR canceling order with id {}", orderId, e);
+            log.warn("ERROR canceling deliveryId with id {}", deliveryId, e);
             throw e;
         }
     }

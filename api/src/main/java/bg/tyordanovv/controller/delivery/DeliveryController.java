@@ -23,6 +23,6 @@ public interface DeliveryController {
 //    @GetMapping("api/v1/delivery/get-status/{deliveryId}")
 //    DeliverySummary getDeliverySummary(@PathVariable Long deliveryId);
 
-    @GetMapping("api/v1/delivery/order-status/{orderId}")
+    @GetMapping("api/v1/delivery/get-status/order/{orderId}")
     Flux<DeliveryDTO> getAllDeliverySummary(@PathVariable Long orderId);
 }

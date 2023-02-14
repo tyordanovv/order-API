@@ -25,7 +25,7 @@ public interface OrderController {
     Mono<Void> createOrder(@RequestBody OrderRequest body);
 
     @PostMapping(value = "/api/v1/order/cancel/{deliveryId}")
-    Mono<Void> cancelOrder(@PathVariable Long orderId);
+    Mono<Void> cancelOrder(@PathVariable Long deliveryId);
     @PostMapping(value ="/api/v1/order/return")
     Mono<Void> returnProduct(@RequestBody ReturnProductRequest request);
 
