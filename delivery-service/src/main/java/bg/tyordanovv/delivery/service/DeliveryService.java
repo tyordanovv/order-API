@@ -8,6 +8,7 @@ import bg.tyordanovv.delivery.persistence.DeliveryEntity;
 import bg.tyordanovv.delivery.persistence.DeliveryRepository;
 import bg.tyordanovv.exceptions.BadRequestException;
 import bg.tyordanovv.exceptions.InvalidInputException;
+import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.requests.delivery.CreateDeliveryRequest;
 import bg.tyordanovv.requests.delivery.UpdateDeliveryRequest;
 import bg.tyordanovv.requests.product.ReturnProductRequest;
@@ -20,7 +21,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 import static bg.tyordanovv.core.delivery.DeliveryStatusEnum.*;
+import static java.util.logging.Level.FINE;
 
 @Slf4j
 @RestController
@@ -66,40 +71,63 @@ public class DeliveryService implements DeliveryController, DeliveryManagementCo
     @Override
     @Transactional
     public Mono<Void> cancelDelivery(Long deliveryId) {
-        //TODO add logic
-//        DeliveryEntity delivery = repository.findById(deliveryId)
-//                .orElseThrow(() -> new NotFoundException("Delivery with this id does not exist!"));
-//
-//        if (delivery.getStatus().equals(PROCESSING) || delivery.getStatus().equals(NON_AVAILABLE)){
-//            delivery.setStatus(CANCELED);
-//            repository.save(delivery);
-//        } else if (delivery.getStatus().equals(CANCELED)){
-//            throw new RuntimeException("Delivery is already canceled");
-//        } else
-//            throw new RuntimeException("Delivery could not be canceled! Current status is " +
-//                    delivery.getStatus());
-        return Mono.empty();
+        return Mono.fromSupplier(() -> repository.findById(deliveryId))
+                .flatMap(optionalDelivery -> {
+                    if (optionalDelivery.isPresent()) {
+                        DeliveryEntity delivery = optionalDelivery.get();
+                        if (delivery.getStatus().equals(PROCESSING) || delivery.getStatus().equals(NON_AVAILABLE)) {
+                            delivery.setStatus(CANCELED);
+                            return Mono.fromSupplier(() -> repository.save(delivery)).then();
+                        } else if (delivery.getStatus().equals(CANCELED)) {
+                            return Mono.error(new InvalidInputException("Delivery is already canceled"));
+                        } else {
+                            return Mono.error(new InvalidInputException("Delivery could not be canceled! Current status is " + delivery.getStatus()));
+                        }
+                    } else {
+                        return Mono.error(new NotFoundException("Delivery with this id does not exist!"));
+                    }
+                })
+                .log(log.getName(), FINE)
+                .subscribeOn(jdbcScheduler);
     }
 
     @Override
     public Mono<Void> returnProduct(ReturnProductRequest request) {
-        //TODO add logic
-//        DeliveryEntity delivery = repository.findById(request.deliveryId())
-//                .orElseThrow(() -> new NotFoundException("Delivery with this productId does not exist!"));
-//
-//        LocalDate currentTime = LocalDate.now();
-//        LocalDate currentDateMinus2Weeks = currentTime.minusWeeks(2);
-//
-//        if (delivery.getStatus().equals(DELIVERED)
-//                && delivery.getLastUpdate().isAfter(currentDateMinus2Weeks)
-//                && (delivery.getOrderedAmount() >= request.quantity())){
-//            sendReturnLabels(delivery, request.quantity());
-//        } else if (delivery.getStatus().equals(RETURN_LABELS_SEND)) {
-//            //TODO send Labels
-//        } else {
-//            throw new BadRequestException("This item could not be returned!");
-//        }
-        return Mono.empty();
+        return Mono.fromSupplier(() -> repository.findById(request.deliveryId()))
+                .flatMap(optionalDelivery -> {
+                    if (optionalDelivery.isPresent()) {
+                        return internalReturnDelivery(optionalDelivery);
+                    } else {
+                        return Mono.error(new NotFoundException("Delivery with this id does not exist!"));
+                    }
+                })
+                .log(log.getName(), FINE)
+                .subscribeOn(jdbcScheduler);
+    }
+
+    private Mono<Void> internalReturnDelivery(Optional<DeliveryEntity> optionalDelivery) {
+        DeliveryEntity delivery = optionalDelivery.get();
+        if (
+                (
+                        delivery.getStatus().equals(DELIVERED)
+                                || delivery.getStatus().equals(RETURN_LABELS_SEND)
+                )
+                        && delivery.getLastUpdate().isAfter(LocalDate.now().minusWeeks(2))
+        ) {
+            delivery.setStatus(RETURN_LABELS_SEND);
+            //TODO send Labels
+            return Mono.fromSupplier(() -> repository.save(delivery)).then();
+        } else if (delivery.getStatus().equals(RETURNED)) {
+            return Mono.error(new InvalidInputException("Delivery is already returned!"));
+        } else if ((
+                delivery.getStatus().equals(DELIVERED)
+                        || delivery.getStatus().equals(RETURN_LABELS_SEND)
+        )
+                && delivery.getLastUpdate().isBefore(LocalDate.now().minusWeeks(2))) {
+            return Mono.error(new InvalidInputException("Delivery could not be returned! Delivered at " + delivery.getLastUpdate()));
+        } else {
+            return Mono.error(new InvalidInputException("Product is still not delivered! Delivery status " + delivery.getStatus()));
+        }
     }
 
     @Override

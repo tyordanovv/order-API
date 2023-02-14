@@ -1,11 +1,12 @@
 package bg.tyordanovv.core.delivery;
 
 public enum DeliveryStatusEnum {
+    NON_AVAILABLE,
     PROCESSING,
+    PROCESSED,
     SHIPPED,
     DELIVERED,
     CANCELED,
     RETURNED,
-    NON_AVAILABLE,
     RETURN_LABELS_SEND
 }
