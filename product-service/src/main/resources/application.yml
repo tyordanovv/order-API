@@ -1,19 +1,13 @@
 server.port: 8083
 
+spring.application.name: product-service
+
+app.eureka-server: localhost
+
 spring.data.mongodb:
   host: localhost
   port: 27017
   database: product-db
-
-#spring:
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#  datasource:
-#    password: password
-#    username: postgres
-#    url: jdbc:postgresql://localhost:5432/product
 
 server.error.include-message: always
 
@@ -23,8 +17,23 @@ logging:
     bg.tyordanovv: DEBUG
     org.springframework.data.mongodb.core.ReactiveMongoTemplate: DEBUG
 
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 ---
 spring.config.activate.on-profile: docker
+
+app.eureka-server: eureka
 
 server.port: 8080
 

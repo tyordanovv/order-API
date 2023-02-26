@@ -32,7 +32,7 @@ public class OrderManagementServiceImpl implements OrderController {
         try {
             log.debug("creates a new composite entity for order");
 
-            //TODO add check if products are available
+            // TODO add check if products are available
 
             orderService.saveOrder(body);
 
@@ -57,7 +57,6 @@ public class OrderManagementServiceImpl implements OrderController {
 
     @Override
     public Mono<Void> cancelOrder(Long deliveryId) {
-        System.out.println("TUKA" + deliveryId);
         try {
             return integrationOrder.cancelDelivery(deliveryId)
                     .doOnError(ex -> log.warn("cancel deliveryId failed: {}", ex.toString()))

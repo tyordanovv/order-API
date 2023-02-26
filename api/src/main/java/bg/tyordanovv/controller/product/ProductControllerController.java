@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @RequestMapping("/api/v1/products/")
-public interface ProductController extends ProductQuantity {
+public interface ProductControllerController extends ProductQuantityController {
 
     @GetMapping("category/{category}")
     Flux<ProductDTO> getProductByCategory(@PathVariable("category") ProductType category);
@@ -23,11 +21,9 @@ public interface ProductController extends ProductQuantity {
     @DeleteMapping(value = "{productId}")
     Mono<Void> deleteProduct(@PathVariable("productId") Long productId);
 
-    @PostMapping(value = "{productId}")
-    Mono<Void> editProduct(@PathVariable("productId") Long productId);
-
-//    @GetMapping("{id}")
-//    Mono<>
+    @PutMapping(consumes = "application/json")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    Mono<Void> editProduct(@RequestBody ProductDTO productDTO);
 
     @GetMapping(
             value = "{productId}",

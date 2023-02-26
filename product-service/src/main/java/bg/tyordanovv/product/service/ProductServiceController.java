@@ -1,9 +1,9 @@
 package bg.tyordanovv.product.service;
 
-import bg.tyordanovv.address.ServiceAddress;
-import bg.tyordanovv.controller.product.ProductController;
+import bg.tyordanovv.controller.product.ProductControllerController;
 import bg.tyordanovv.core.product.ProductDTO;
 import bg.tyordanovv.core.product.ProductType;
+import bg.tyordanovv.exceptions.BadRequestException;
 import bg.tyordanovv.exceptions.InvalidInputException;
 import bg.tyordanovv.exceptions.NotFoundException;
 import bg.tyordanovv.product.persistence.ProductEntity;
@@ -23,13 +23,13 @@ import java.util.logging.Level;
 
 @Slf4j
 @RestController
-public class ProductService implements ProductController {
+public class ProductServiceController implements ProductControllerController {
     private final ProductRepository repository;
     private final ProductMapper mapper;
 //    private final ServiceAddress serviceAddress;
 
     @Autowired
-    public ProductService(
+    public ProductServiceController(
             ProductRepository repository,
             ProductMapper mapper
 //            ServiceAddress serviceAddress
@@ -42,11 +42,15 @@ public class ProductService implements ProductController {
     @Override
     public Flux<ProductDTO> getProductByCategory(ProductType type) {
         log.info("product summary list returned");
-        //TODO add check if enum exists
-        return repository.findByType(type)
-                .map(mapper::entityToApi)
+        if (type != null) {
+            return repository.findByType(type)
+                    .map(mapper::entityToApi)
 //                .map(this::setServiceAddress)
-                ;
+                    ;
+        } else {
+            return Flux.error(() -> new InvalidInputException("Invalid product type input: NONE"));
+        }
+
     }
 
     @Override
@@ -79,9 +83,23 @@ public class ProductService implements ProductController {
     }
 
     @Override
-    public Mono<Void> editProduct(Long productId) {
-        //TODO add logic
-        return null;
+    public Mono<Void> editProduct(ProductDTO productDTO) {
+        if (productDTO.getProductId() < 1){
+            return Mono.error(
+                    new InvalidInputException(
+                            "Invalid product ID " + productDTO.getProductId() + ". ID should not be less than 1"
+                    ));
+        }
+        log.debug("Edit product entity with productId {}", productDTO.getProductId());
+        return repository.findByProductId(productDTO.getProductId())
+                .flatMap(productEntity -> {
+                    if (productDTO.getName() != null) productEntity.setName(productDTO.getName());
+                    if (productDTO.getDescription() != null) productEntity.setDescription(productDTO.getDescription());
+                    if (productDTO.getType() != null) productEntity.setType(productDTO.getType());
+                    if (productDTO.getPrice() != null) productEntity.setPrice(productDTO.getPrice());
+                    return repository.save(productEntity);
+                })
+                .then();
     }
 
     @Override
@@ -98,9 +116,23 @@ public class ProductService implements ProductController {
     }
 
     @Override
-    public void editProductQuantity(List<OrderedProductDTO> productList) {
-        //TODO add Mono<>
+    public Mono<Void> editProductQuantity(List<OrderedProductDTO> productList) {
+        return Flux.fromIterable(productList)
+                .flatMap(orderedProductDTO -> repository.findByProductId(orderedProductDTO.id())
+                        .flatMap(product -> {
+                            int currentQuantity = product.getQuantity();
+                            int orderedQuantity = orderedProductDTO.quantity();
+
+                            if (currentQuantity < orderedQuantity) {
+                                return Mono.error(new BadRequestException("Not enough product quantity!"));
+                            } else {
+                                product.setQuantity(currentQuantity - orderedQuantity);
+                                return repository.save(product);
+                            }
+                        }))
+                .then();
     }
+
 
 //    private ProductDTO setServiceAddress(ProductDTO product) {
 //        product.setServiceAddress(serviceAddress.getServiceAddress());

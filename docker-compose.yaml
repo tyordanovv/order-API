@@ -14,7 +14,8 @@ services:
       - spring
       - postgres
     depends_on:
-      - postgres
+      mongodb:
+        condition: service_healthy
 
   delivery:
     image: tyordanovv/delivery-service:latest
@@ -93,6 +94,17 @@ services:
     ports:
       - "27017:27017"
     command: mongod
+    healthcheck:
+      test: "mongo --eval 'db.stats().ok'"
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+  eureka:
+    build: eureka-service
+    mem_limit: 200m
+    ports:
+      - "8761:8761"
 
 networks:
   postgres:

@@ -1,5 +1,7 @@
 server.port: 8082
 
+spring.application.name: order-service
+
 spring:
   jpa:
     hibernate:
@@ -12,85 +14,26 @@ spring:
 
 server.error.include-message: always
 
-app:
-  product-service:
-    host: localhost
-    port: 8083
-  delivery-service:
-    host: localhost
-    port: 8080
-  email-service:
-    host: localhost
-    port: 8081
-
 logging:
   level:
     root: INFO
     bg.tyordanovv: DEBUG
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
 
 ---
 spring.config.active.on-profile: docker
 
 server.port: 8082
 
-app:
-  product-service:
-    host: localhost
-    port: 8083
-  delivery-service:
-    host: localhost
-    port: 8080
-  email-service:
-    host: localhost
-    port: 8081
-
-
-
-
-    #api:
-    #  common:
-    #    version: 1.0.0
-    #    title: Order processing API
-    #    description: API for full covered order management
-    #    termsOfService: terms of service
-    #    license: my license
-    #    licenseUrl: license URL
-    #
-    #    externalDocDescription: external doc description
-    #    externalDocUrl: external doc URL
-    #    contact:
-    #      name: contact name
-    #      url: contact.com
-    #      email: contact@gmail.com
-    #
-    #  responseCodes:
-    #    ok.description: OK
-    #    badRequest.description: Bad request, invalid format of the request. See response message for more information.
-    #    notFound.description: Not found, the specified object does not exist.
-    #    unprocessableEntity.description: Unprocessable entity, caused by incorrect parameters. See response message for more information.
-    #
-    #  order:
-    #    get-order:
-    #      description: Returns summary of the order containing order id, delivery status, items and corresponding quantity,
-    #        and users first and last name
-    #      notes: |
-    #        # Normal response
-    #        Returns all the elements from the description
-    #
-    #        CODE 200
-    #
-    #        # Multiple deliveries
-    #        Returns normal response but with multiple delivery ID. That happens when the order is delivered partially (TO BE IMPLEMENTED)
-    #
-    #        CODE 200
-    #
-    #        # Error
-    #        No order found or corrupted request
-    #
-    #        CODE 400, 404, 422
-
-#springdoc:
-#  swagger-ui.path: /swagger-ui.html
-#  api-docs.path: /v3/api-docs
-#  packagesToScan: bg.tyordanovv.order
-#  pathsToMatch: /**
+app.eureka-server: eureka

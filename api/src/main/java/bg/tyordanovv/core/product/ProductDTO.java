@@ -15,6 +15,6 @@ public class ProductDTO{
         String name;
         String description;
         ProductType type;
-        double price;
+        Double price;
         String serviceAddress;
 }

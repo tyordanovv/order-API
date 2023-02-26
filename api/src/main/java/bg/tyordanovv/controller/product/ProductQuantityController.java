@@ -3,12 +3,13 @@ package bg.tyordanovv.controller.product;
 import bg.tyordanovv.requests.product.OrderedProductDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-public interface ProductQuantity {
+public interface ProductQuantityController {
 
-    @PostMapping("/api/v1/ordered-product")
+    @PostMapping("/api/v1/product/order/")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    void editProductQuantity(@RequestBody List<OrderedProductDTO> productList);
+    Mono<Void> editProductQuantity(@RequestBody List<OrderedProductDTO> productList);
 }

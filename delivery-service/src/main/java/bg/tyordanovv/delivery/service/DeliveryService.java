@@ -31,9 +31,7 @@ import static java.util.logging.Level.FINE;
 @RestController
 public class DeliveryService implements DeliveryManagementController {
     private final DeliveryRepository repository;
-
     private final DeliveryMapper mapper;
-
     private final Scheduler jdbcScheduler;
 //    private final ServiceAddress serviceAddress;
 

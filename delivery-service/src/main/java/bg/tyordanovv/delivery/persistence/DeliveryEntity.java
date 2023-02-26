@@ -1,10 +1,11 @@
 package bg.tyordanovv.delivery.persistence;
 
 import bg.tyordanovv.core.delivery.DeliveryStatusEnum;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Version;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity

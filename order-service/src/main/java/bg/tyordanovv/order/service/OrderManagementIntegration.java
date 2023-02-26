@@ -2,7 +2,7 @@ package bg.tyordanovv.order.service;
 
 import bg.tyordanovv.controller.delivery.DeliveryController;
 import bg.tyordanovv.controller.email.EmailController;
-import bg.tyordanovv.controller.product.ProductQuantity;
+import bg.tyordanovv.controller.product.ProductQuantityController;
 import bg.tyordanovv.core.delivery.DeliveryDTO;
 import bg.tyordanovv.core.email.EmailType;
 import bg.tyordanovv.exceptions.CustomHttpError;
@@ -13,8 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,9 +25,11 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.List;
 
+import static java.util.logging.Level.FINE;
+
 @Slf4j
 @Component
-public class OrderManagementIntegration implements DeliveryController, EmailController, ProductQuantity {
+public class OrderManagementIntegration implements DeliveryController, EmailController, ProductQuantityController {
 
     private final String PRODUCT_SERVICE_URL;
     private final String DELIVERY_SERVICE_URL;
@@ -36,19 +41,16 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     @Autowired
     public OrderManagementIntegration(
             ObjectMapper mapper,
-            WebClient.Builder webClient,
-            @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.port}") String productServicePort,
-            @Value("${app.delivery-service.host}") String deliveryServiceHost,
-            @Value("${app.delivery-service.port}") String deliveryServicePort,
-            @Value("${app.email-service.host}") String emailServiceHost,
-            @Value("${app.email-service.port}") String emailServicePort
+            WebClient.Builder webClient
             ){
         this.mapper = mapper;
         this.webClient = webClient.build();
-        this.PRODUCT_SERVICE_URL = "http://" + productServiceHost + ":" + productServicePort + "/api/v1/product/";
-        this.DELIVERY_SERVICE_URL = "http://" + deliveryServiceHost + ":" + deliveryServicePort + "/api/v1/delivery/";
-        this.EMAIL_SERVICE_URL = "http://" + emailServiceHost + ":" + emailServicePort;
+//        this.PRODUCT_SERVICE_URL = "http://localhost:8083/api/v1/product/";
+//        this.DELIVERY_SERVICE_URL = "http://localhost:8080/api/v1/delivery/";
+//        this.EMAIL_SERVICE_URL = "http://localhost:8081/";
+        this.PRODUCT_SERVICE_URL = "http://product-service/api/v1/product/";
+        this.DELIVERY_SERVICE_URL = "http://delivery-service/api/v1/delivery/";
+        this.EMAIL_SERVICE_URL = "http://email-service/";
     }
 
     @Override
@@ -89,11 +91,38 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
     }
 
     @Override
-    public void editProductQuantity(List<OrderedProductDTO> productList) {
-        //TODO edit product quantity method
+    public Mono<Void> editProductQuantity(List<OrderedProductDTO> productList) {
+        String url = PRODUCT_SERVICE_URL + "order/";
+        log.debug("Will call editProductQuantity API on URL: {}", url);
 
-        log.info("order mng editProductQuantity");
-        //        return null;
+        return webClient.post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(productList))//creates JSON from List<OrderedProductDTO>
+                .retrieve()
+                .bodyToMono(Void.class);
+    }
+
+    public Mono<Health> getProductHealth() {
+        return getHealth(PRODUCT_SERVICE_URL);
+    }
+
+    public Mono<Health> getDeliveryHealth() {
+        return getHealth(DELIVERY_SERVICE_URL);
+    }
+
+    public Mono<Health> getEmailHealth() {
+        return getHealth(EMAIL_SERVICE_URL);
+    }
+
+
+    private Mono<Health> getHealth(String url) {
+        url += "/actuator/health";
+        log.debug("Will call the Health API on URL: {}", url);
+        return webClient.get().uri(url).retrieve().bodyToMono(String.class)
+                .map(s -> new Health.Builder().up().build())
+                .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
+                .log(log.getName(), FINE);
     }
 
     private String getErrorMessage(HttpClientErrorException ex) {
