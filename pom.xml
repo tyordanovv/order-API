@@ -16,6 +16,7 @@
         <module>util</module>
         <module>api</module>
         <module>eureka-service</module>
+        <module>gateway-service</module>
     </modules>
 
     <name>order-process-api</name>

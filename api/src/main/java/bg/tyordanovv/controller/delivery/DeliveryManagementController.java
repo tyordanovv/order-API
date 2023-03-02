@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
 public interface DeliveryManagementController extends DeliveryController {
-    @PostMapping("api/v1/delivery/update")
+    @PostMapping("api/v1/delivery-internal/update")
     Mono<Void> updateDelivery(@RequestBody DeliveryDTO request);
 }

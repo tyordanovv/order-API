@@ -1,11 +1,8 @@
-version: '1.0'
+version: '2.1'
 
 services:
   product:
-    image: tyordanovv/product-service:latest
     container_name: product-service
-    ports:
-      - "8083:8083"
     build: product-service
     mem_limit: 200m
     environment:
@@ -18,10 +15,7 @@ services:
         condition: service_healthy
 
   delivery:
-    image: tyordanovv/delivery-service:latest
     container_name: delivery-service
-    ports:
-      - "8080:8080"
     build: delivery-service
     mem_limit: 200m
     environment:
@@ -33,10 +27,7 @@ services:
       - postgres
 
   email:
-    image: tyordanovv/email-service:latest
     container_name: email-service
-    ports:
-      - "8081:8081"
     build: email-service
     mem_limit: 200m
     environment:
@@ -45,27 +36,33 @@ services:
       - spring
 
   order:
-    image: tyordanovv/erder-service:latest
     container_name: order-service
-    ports:
-      - "8082:8082"
     build: order-service
     mem_limit: 200m
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/order
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#      - SERVER_PORT=8080
     networks:
       - spring
       - postgres
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres
-    container_name: postgres-db
+    container_name: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      PGDATA: /data/postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - PGDATA=/data/postgres
     volumes:
       - postgres:/data/postgres
     ports:
@@ -105,6 +102,14 @@ services:
     mem_limit: 200m
     ports:
       - "8761:8761"
+
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: gateway-service
+    mem_limit: 512m
+    ports:
+      - "8080:8080"
 
 networks:
   postgres:
