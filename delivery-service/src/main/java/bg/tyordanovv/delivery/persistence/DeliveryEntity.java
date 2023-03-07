@@ -15,9 +15,19 @@ import java.time.LocalDate;
 public class DeliveryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @Version
     private int version;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setLastUpdate(LocalDate lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
     @Column(name = "address")
     private String address;
     @Column(name = "last_update")
