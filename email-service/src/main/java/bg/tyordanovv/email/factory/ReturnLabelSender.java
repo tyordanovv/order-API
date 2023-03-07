@@ -14,6 +14,10 @@ public class ReturnLabelSender implements Sender<ReturnLabelSender> {
     }
 
     @Override
+    public String testEmail() {
+        return "Hello 4";
+    }
+    @Override
     public EmailType getType() {
         return RETURN_LABEL;
     }

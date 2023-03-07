@@ -14,6 +14,8 @@ spring:
 
 server.error.include-message: always
 
+app.eureka-server: localhost
+
 logging:
   level:
     root: INFO
@@ -22,9 +24,7 @@ logging:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
+      defaultZone: http://${app.eureka-server}:8761/eureka/
     initialInstanceInfoReplicationIntervalSeconds: 5
     registryFetchIntervalSeconds: 5
   instance:
@@ -33,7 +33,3 @@ eureka:
 
 ---
 spring.config.active.on-profile: docker
-
-server.port: 8080
-
-app.eureka-server: eureka

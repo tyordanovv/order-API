@@ -11,4 +11,9 @@ public class EmailService implements EmailController {
     @Override
     public void send(EmailType type, String request) {
     }
+
+    @Override
+    public String testEmail() {
+        return "Hello";
+    }
 }

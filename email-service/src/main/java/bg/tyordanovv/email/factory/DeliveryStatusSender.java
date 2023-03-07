@@ -13,6 +13,11 @@ public class DeliveryStatusSender implements Sender<DeliveryStatusSender>{
     }
 
     @Override
+    public String testEmail() {
+        return "Hello2";
+    }
+
+    @Override
     public EmailType getType() {
         return DELIVERY_STATUS;
     }

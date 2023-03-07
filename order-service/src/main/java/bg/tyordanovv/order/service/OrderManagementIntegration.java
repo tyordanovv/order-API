@@ -29,7 +29,7 @@ import static java.util.logging.Level.FINE;
 
 @Slf4j
 @Component
-public class OrderManagementIntegration implements DeliveryController, EmailController, ProductQuantityController {
+public class OrderManagementIntegration implements DeliveryController, ProductQuantityController {
 
     private final String PRODUCT_SERVICE_URL;
     private final String DELIVERY_SERVICE_URL;
@@ -133,10 +133,10 @@ public class OrderManagementIntegration implements DeliveryController, EmailCont
         }
     }
 
-    @Override
-    public void send(EmailType type, String request) {
-
-    }
+//    @Override
+//    public void send(EmailType type, String request) {
+//
+//    }
 
     public Mono<Void> returnProduct(ReturnProductRequest body) {
         String url = DELIVERY_SERVICE_URL + "return";

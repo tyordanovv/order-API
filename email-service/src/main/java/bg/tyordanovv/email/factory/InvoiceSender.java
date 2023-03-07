@@ -18,6 +18,11 @@ public class InvoiceSender implements Sender<InvoiceSender> {
     }
 
     @Override
+    public String testEmail() {
+        return "Hello 3";
+    }
+
+    @Override
     public EmailType getType() {
         return INVOICE;
     }

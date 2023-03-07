@@ -14,6 +14,11 @@ public class ConfirmationSender implements Sender<ConfirmationSender> {
     }
 
     @Override
+    public String testEmail() {
+        return "Hello 1";
+    }
+
+    @Override
     public EmailType getType() {
         return CONFIRMATION;
     }
