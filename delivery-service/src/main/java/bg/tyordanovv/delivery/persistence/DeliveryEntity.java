@@ -3,7 +3,6 @@ package bg.tyordanovv.delivery.persistence;
 import bg.tyordanovv.core.delivery.DeliveryStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Version;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -19,15 +18,6 @@ public class DeliveryEntity {
     private Long id;
     @Version
     private int version;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setLastUpdate(LocalDate lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
     @Column(name = "address")
     private String address;
     @Column(name = "last_update")
@@ -69,5 +59,12 @@ public class DeliveryEntity {
     }
 
     public void setQuantity(int quantity) {
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setLastUpdate(LocalDate lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

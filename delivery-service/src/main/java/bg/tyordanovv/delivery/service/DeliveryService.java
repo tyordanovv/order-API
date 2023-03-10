@@ -33,19 +33,16 @@ public class DeliveryService implements DeliveryManagementController {
     private final DeliveryRepository repository;
     private final DeliveryMapper mapper;
     private final Scheduler jdbcScheduler;
-//    private final ServiceAddress serviceAddress;
 
 
     public DeliveryService(
             @Qualifier("jdbcScheduler") Scheduler jdbcScheduler,
             DeliveryRepository repository,
             DeliveryMapper mapper
-//            ,ServiceAddress serviceAddress
     ) {
         this.jdbcScheduler = jdbcScheduler;
         this.repository = repository;
         this.mapper = mapper;
-//        this.serviceAddress = serviceAddress;
     }
     @Override
     public Mono<Void> createDelivery(CreateDeliveryRequest request) {

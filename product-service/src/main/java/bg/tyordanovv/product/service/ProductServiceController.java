@@ -26,17 +26,14 @@ import java.util.logging.Level;
 public class ProductServiceController implements ProductControllerController {
     private final ProductRepository repository;
     private final ProductMapper mapper;
-//    private final ServiceAddress serviceAddress;
 
     @Autowired
     public ProductServiceController(
             ProductRepository repository,
             ProductMapper mapper
-//            ServiceAddress serviceAddress
     ){
         this.repository = repository;
         this.mapper = mapper;
-//        this.serviceAddress = serviceAddress;
     }
 
     @Override
@@ -45,7 +42,6 @@ public class ProductServiceController implements ProductControllerController {
         if (type != null) {
             return repository.findByType(type)
                     .map(mapper::entityToApi)
-//                .map(this::setServiceAddress)
                     ;
         } else {
             return Flux.error(() -> new InvalidInputException("Invalid product type input: NONE"));
@@ -132,10 +128,4 @@ public class ProductServiceController implements ProductControllerController {
                         }))
                 .then();
     }
-
-
-//    private ProductDTO setServiceAddress(ProductDTO product) {
-//        product.setServiceAddress(serviceAddress.getServiceAddress());
-//        return product;
-//    }
 }

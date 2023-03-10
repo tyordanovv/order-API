@@ -13,4 +13,6 @@ public interface ProductRepository extends ReactiveCrudRepository<ProductEntity,
     Mono<ProductEntity> findByProductId(Long productId);
 
     Flux<ProductEntity> findByType(ProductType type);
+
+    Mono<Void> deleteByProductId(Long productId);
 }
