@@ -92,9 +92,9 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     build: gateway-service
-    mem_limit: 512m
+    mem_limit: 200m
     ports:
-      - "8080:8080"
+      - "8443:8443"
 
 volumes:
   postgres:
