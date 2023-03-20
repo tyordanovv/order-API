@@ -11,8 +11,8 @@ server.ssl:
 app:
   eureka-username: euser
   eureka-password: password
-
-app.eureka-server: localhost
+  eureka-server: localhost
+  auth-server: localhost
 
 eureka:
   client:
@@ -32,6 +32,7 @@ logging:
     root: INFO
     org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
     org.springframework.cloud.gateway: TRACE
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
 
 #Routes
 spring.cloud.gateway.routes:
@@ -85,5 +86,26 @@ spring.cloud.gateway.routes:
     filters:
     - SetPath=/501
 
+  - id: oauth2-server
+    uri: lb://auth-server
+    predicates:
+      - Path=/oauth2/**
+
+  - id: oauth2-login
+    uri: lb://auth-server
+    predicates:
+      - Path=/login/**
+
+  - id: oauth2-error
+    uri: lb://auth-server
+    predicates:
+      - Path=/error/**
+
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}:9999
+
 ---
 spring.config.activate.on-profile: docker
+
+app:
+  eureka-server: eureka
+  auth-server: auth-server
