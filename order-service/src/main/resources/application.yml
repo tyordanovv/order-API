@@ -14,6 +14,92 @@ spring:
 
 server.error.include-message: always
 
+springdoc:
+  swagger-ui.path: /openapi/swagger-ui.html
+  api-docs.path: /openapi/v3/api-docs
+  packagesToScan: bg.tyordanovv.order
+  pathsToMatch: /**
+  cache.disabled: true
+
+#  swagger-ui:
+#    oauth2-redirect-url: https://localhost:8443/webjars/swagger-ui/oauth2-redirect.html
+#    oauth:
+#      clientId: writer
+#      clientSecret: secret
+#      useBasicAuthenticationWithAccessCodeGrant: true
+#  oAuthFlow:
+#    authorizationUrl: https://localhost:8443/oauth2/authorize
+#    tokenUrl: https://localhost:8443/oauth2/token
+
+api:
+  common:
+    version: 1.0.0
+    title: Order API
+    description: API for processing order requests and maintaining the delivery and product management tasks
+    termsOfService: terms of service
+    license: license
+    licenseUrl: license url
+
+    externalDocDesc: MY WIKI PAGE
+    externalDocUrl: MY WIKI URL
+    contact:
+      name: Tihomir Yordanov
+      url: https://github.com/tyordanovv
+      email: t.yordanovv@gmail.com
+
+  responseCodes:
+    ok.description: OK
+    badRequest.description: Bad Request, invalid format of the request!
+    notFound.description: Not found, the specified id does not exist!
+    unprocessableEntity.description: Unprocessable entity, input parameters caused the processing to fail!
+
+  order:
+    create-order:
+      description: |
+        Checks if the product quantity is sufficient if that is the case delivery request is sent and order is created
+      notes: |
+        # Success response
+        The order information posted to the API will be split up, product quantity will be updated, delivery request
+        will be sent and oder will be saved.
+        
+        # Error responses
+        1. If an order with the same oderId as specified in the posted information already exists,
+           an **422 - Unprocessable Entity** error with a "duplicate key" error message will be returned
+
+    cancel-order:
+      description: Cancels an order if it is not shipped
+      notes: |
+        # Success response
+        Status will be updated to canceled and product quantity will be updated.
+
+    return-order:
+      description: |
+        Order could be returned if it is in the specified from the seller return period and it does not meet the seller
+        requirements.
+      notes: |
+        # Success response
+        Status will be updated to sent labels and user will receive his return labels per mail.
+
+    get-order:
+      description: Returns a composite view of the specified order Id
+      notes: |
+        # Normal response
+        If the requested oder id is found the method will return information regarding:
+        1. Order information (order id, order number, date of creation, price)
+        2. Delivery information (delivery id, address, date of last update, status)
+
+        # Expected partial and error responses
+        1. If no order information is found, a **404 - Not Found** error will be returned
+    get-orders:
+      description: Returns a composite view of the specified user email
+      notes: |
+        # Normal response
+        If the requested oder id is found the method will return list with information regarding:
+        1. Order information (order id, order number, date of creation, price)
+        2. Delivery information (delivery id, address, date of last update, status)
+
+        # Expected partial and error responses
+        1. If no order information is found, a **404 - Not Found** error will be returned
 logging:
   level:
     root: INFO
