@@ -6,12 +6,14 @@ import bg.tyordanovv.responses.order.OrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@SecurityRequirement(name = "security_auth") // requires security schema (OpenApiConfig)
 @Tag(name = "Order", description = "REST API for full order management.")
 public interface OrderController {
 

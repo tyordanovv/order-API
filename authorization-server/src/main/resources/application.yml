@@ -1,7 +1,5 @@
 server.port: 9999
-#server.forward-headers-strategy: framework
-
-spring.application.name: auth-server
+server.forward-headers-strategy: framework
 
 app:
   eureka-username: euser
@@ -24,7 +22,6 @@ management.endpoints.web.exposure.include: "*"
 logging:
   level:
     root: INFO
-
 ---
 spring.config.activate.on-profile: docker
 

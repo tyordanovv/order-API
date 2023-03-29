@@ -1,8 +1,6 @@
 package bg.tyordanovv.order;
 
 import bg.tyordanovv.order.service.OrderManagementIntegration;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
