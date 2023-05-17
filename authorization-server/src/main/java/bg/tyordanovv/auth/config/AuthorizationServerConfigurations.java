@@ -28,7 +28,7 @@ public class AuthorizationServerConfigurations {
     @Bean
     public RegisteredClientRepository registeredClientRepository() {
 
-        log.info("register OAUth client allowing all grant flows...");
+        log.info("register OAuth client with full access.");
         RegisteredClient writerClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("writer")
                 .clientSecret("secret")
@@ -45,6 +45,7 @@ public class AuthorizationServerConfigurations {
                 .tokenSettings(ts -> ts.accessTokenTimeToLive(Duration.ofHours(1)))
                 .build();
 
+        log.info("register OAuth client with read access.");
         RegisteredClient readerClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("reader")
                 .clientSecret("secret")

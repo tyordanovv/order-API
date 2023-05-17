@@ -49,6 +49,7 @@ spring.cloud.gateway.routes:
 
   - id: product-management
     uri: lb://product-service
+#    uri: lb://product-service
     predicates:
       - Path=/api/v1/products/**
 

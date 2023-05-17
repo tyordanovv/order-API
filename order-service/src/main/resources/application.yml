@@ -107,6 +107,7 @@ logging:
 app:
   eureka-username: euser
   eureka-password: password
+  auth-server: localhost
 
 app.eureka-server: localhost
 
@@ -120,8 +121,7 @@ eureka:
     leaseRenewalIntervalInSeconds: 5
     leaseExpirationDurationInSeconds: 5
 
-app.auth-server: localhost
-spring.security.oauth2.resourceserver.jwt.issuer-uri: "http://${app.auth-server}:9999"
+spring.security.oauth2.resourceserver.jwt.issuer-uri: "http://localhost:9999"
 
 ---
 spring.config.active.on-profile: docker

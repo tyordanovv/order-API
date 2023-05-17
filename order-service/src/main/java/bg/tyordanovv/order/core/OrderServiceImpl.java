@@ -73,8 +73,6 @@ public class OrderServiceImpl {
         if (orderId < 1) {
             throw new InvalidInputException("Invalid input for order ID: " + orderId);
         }
-
-        log.info("Executing SELECT order for ID = {}", orderId);
         return Mono.fromCallable(() -> orderRepository.findById(orderId)
                         .orElseThrow(() -> new NotFoundException("Order with ID " + orderId + " was not found")))
                 .log(log.getName(), FINE)

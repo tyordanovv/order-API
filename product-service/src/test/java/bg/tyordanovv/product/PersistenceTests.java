@@ -35,7 +35,14 @@ public class PersistenceTests extends MongoDbTestBase{
 
     @Test
     void shouldSaveProduct() {
-        ProductEntity product = new ProductEntity("Product", "Description", ProductType.ELECTRONICS, 10.0, 1.0, 10);
+        ProductEntity product = new ProductEntity(
+                "Product",
+                "Description",
+                ProductType.ELECTRONICS,
+                10.0,
+                1.0,
+                10
+        );
         Mono<ProductEntity> savedProductMono = productRepository.save(product);
 
         StepVerifier.create(savedProductMono)
@@ -45,7 +52,14 @@ public class PersistenceTests extends MongoDbTestBase{
 
     @Test
     void shouldFindProductById() {
-        ProductEntity product = new ProductEntity( "Product", "Description", ProductType.ELECTRONICS, 10.0, 1.0, 10);
+        ProductEntity product = new ProductEntity(
+                "Product",
+                "Description",
+                ProductType.ELECTRONICS,
+                10.0,
+                1.0,
+                10
+        );
         Mono<ProductEntity> savedProductMono = productRepository.save(product);
 
         Mono<ProductEntity> foundProductMono = savedProductMono.flatMap(savedProduct -> productRepository.findByProductId(savedProduct.getProductId()));
@@ -57,8 +71,22 @@ public class PersistenceTests extends MongoDbTestBase{
 
     @Test
     void shouldFindAllProducts() {
-        ProductEntity product1 = new ProductEntity("Product1", "Description1", ProductType.ELECTRONICS, 10.0, 1.0, 10);
-        ProductEntity product2 = new ProductEntity("Product2", "Description2", ProductType.BOOKS, 20.0, 2.0, 10);
+        ProductEntity product1 = new ProductEntity(
+                "Product1",
+                "Description1",
+                ProductType.ELECTRONICS,
+                10.0,
+                1.0,
+                10
+        );
+        ProductEntity product2 = new ProductEntity(
+                "Product2",
+                "Description2",
+                ProductType.BOOKS,
+                20.0,
+                2.0,
+                10
+        );
         Flux<ProductEntity> savedProductsFlux = productRepository.saveAll(Arrays.asList(product1, product2));
 
         Flux<ProductEntity> foundProductsFlux = savedProductsFlux.thenMany(productRepository.findAll());
@@ -71,7 +99,14 @@ public class PersistenceTests extends MongoDbTestBase{
 
     @Test
     void shouldDeleteProductById() {
-        ProductEntity product = new ProductEntity("Product", "Description", ProductType.ELECTRONICS, 10.0, 1.0, 10);
+        ProductEntity product = new ProductEntity(
+                "Product",
+                "Description",
+                ProductType.ELECTRONICS,
+                10.0,
+                1.0,
+                10
+        );
         Mono<ProductEntity> savedProductMono = productRepository.save(product);
 
         Mono<Void> deletedProductMono = savedProductMono.flatMap(savedProduct -> productRepository.deleteByProductId(savedProduct.getProductId()));

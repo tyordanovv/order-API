@@ -16,9 +16,9 @@ public class SecurityConfiguration {
                 .pathMatchers("/openapi/**").permitAll()
                 .pathMatchers("/webjars/**").permitAll()
                 .pathMatchers("/actuator/**").permitAll()// let all the users access this url
-                .pathMatchers(POST, "/order-service/**").hasAuthority("SCOPE_product:write")
-                .pathMatchers(DELETE, "/order-service/**").hasAuthority("SCOPE_product:write")
-                .pathMatchers(GET, "/order-service/**").hasAuthority("SCOPE_product:read")
+                .pathMatchers(POST, "/order-service/**").hasAuthority("SCOPE_order:write")
+                .pathMatchers(DELETE, "/order-service/**").hasAuthority("SCOPE_order:write")
+                .pathMatchers(GET, "/order-service/**").hasAuthority("SCOPE_order:read")
                 .anyExchange().authenticated()
                 .and()
                 .oauth2ResourceServer()
